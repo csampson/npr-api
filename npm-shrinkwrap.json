@@ -1,0 +1,30 @@
+{
+  "version": "0.1.0",
+  "dependencies": {
+    "axios": {
+      "version": "0.11.0",
+      "from": "axios@latest",
+      "resolved": "https://registry.npmjs.org/axios/-/axios-0.11.0.tgz"
+    },
+    "debug": {
+      "version": "2.2.0",
+      "from": "debug@>=2.2.0 <3.0.0",
+      "resolved": "https://npm.lucidhq.com/debug/-/debug-2.2.0.tgz"
+    },
+    "follow-redirects": {
+      "version": "0.0.7",
+      "from": "follow-redirects@0.0.7",
+      "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-0.0.7.tgz"
+    },
+    "ms": {
+      "version": "0.7.1",
+      "from": "ms@0.7.1",
+      "resolved": "https://npm.lucidhq.com/ms/-/ms-0.7.1.tgz"
+    },
+    "stream-consume": {
+      "version": "0.1.0",
+      "from": "stream-consume@>=0.1.0 <0.2.0",
+      "resolved": "https://npm.lucidhq.com/stream-consume/-/stream-consume-0.1.0.tgz"
+    }
+  }
+}
