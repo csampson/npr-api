@@ -1,3 +1,11 @@
+/**
+ * @overview  Application entry-point
+ * @module    app
+ * @requires  boom
+ * @requires  hapi
+ * @requires  routes
+ */
+
 'use strict';
 
 const Boom   = require('boom');
