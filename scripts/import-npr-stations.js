@@ -1,9 +1,9 @@
 /**
- *  @overview  Imports station objects from the NPR API v2
- *  @module    import-npr-stations
- *  @requires  axios
- *  @requires  fs
- *  @requires  path
+ * @overview  Imports station objects from the NPR API v2
+ * @module    import-npr-stations
+ * @requires  axios
+ * @requires  fs
+ * @requires  path
  */
 
 'use strict';

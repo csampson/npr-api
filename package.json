@@ -1,7 +1,17 @@
 {
   "private": true,
+  "engines": {
+    "node": "~6.0.0",
+    "npm": "~3.8.8"
+  },
   "version": "0.1.0",
+  "scripts": {
+    "start": "node ./app"
+  },
   "dependencies": {
-    "axios": "^0.11.0"
+    "axios": "^0.11.0",
+    "boom": "^3.1.2",
+    "hapi": "^13.3.0",
+    "joi": "^8.0.5"
   }
 }
