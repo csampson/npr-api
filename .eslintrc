@@ -1,0 +1,14 @@
+{
+  "extends": "airbnb",
+  "rules": {
+    "comma-dangle": ["error", "only-multiline"],
+    "max-len": [1, 175, 2, { "ignoreComments": true }],
+    "no-cond-assign": [2, "except-parens"],
+    "no-unused-vars": [1, { "vars": "local", "args": "none" }],
+    "default-case": 0,
+    "no-param-reassign": 0,
+    "no-multi-spaces": 0,
+    "no-underscore-dangle": ["error", { "allowAfterThis": true }],
+    "quotes": [2, "single", { "avoidEscape": true, "allowTemplateLiterals": true }]
+  }
+}
