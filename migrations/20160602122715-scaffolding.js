@@ -42,7 +42,7 @@ function importStations(database, connection) {
     const imports  = files.map(importStation);
 
     let stations = imports.reduce((prev, current) => prev.concat(current), []);
-    
+
     // Insert ReQL geospatial points
     stations = stations.map(station => {
       if (station.geolocation.longitude) {
@@ -50,10 +50,10 @@ function importStations(database, connection) {
       } else {
         station.geolocation = null;
       }
-      
+
       return station;
     });
-    
+
     database.db('radio_api').table('stations').insert(stations).run(connection, results => {
       console.log('...done');
       resolve(results);
