@@ -86,8 +86,6 @@ function fetchGeolocations(stations) {
   const iterator   = new Set(stations).values();
   const operations = [];
 
-  let index = 0;
-
   return new Promise((resolve, reject) => {
     const fetcher = setInterval(() => {
       const iteration = iterator.next();
@@ -98,7 +96,6 @@ function fetchGeolocations(stations) {
       }
 
       operations.push(fetchGeolocation(iteration.value));
-      index++;
     }, 250);
   });
 }
