@@ -1,34 +1,20 @@
 'use strict';
 
-const Boom     = require('boom');
-const Joi      = require('joi');
-const database = require('rethinkdb');
+const Boom = require('boom');
+const Joi  = require('joi');
 
-// @todo Move this to `lib/database`
-let dbConnection;
-
-database.connect({ db: 'radio_api' })
-  .then(conn => { dbConnection = conn; })
-  .catch(err => { throw new Error(err); });
+const Stations = require('./models/stations');
 
 module.exports = [
   {
     method: 'GET',
-    path: '/',
-    handler: (request, reply) => {
-      reply();
-    }
-  },
-
-  {
-    method: 'GET',
     path: '/stations',
     handler: (request, reply) => {
-      database.table('stations').run(dbConnection, (err, cursor) => {
-        cursor.toArray((err, set) => {
-          reply(set);
+      Stations.fetch()
+        .then(reply)
+        .catch(err => {
+          Boom.wrap(err, 500);
         });
-      });
     }
   }
 ];
