@@ -1,9 +1,11 @@
 {
   "private": true,
+  "version": "0.1.0",
   "engines": {
     "node": "~6.0.0",
     "npm": "~3.8.8"
   },
+  "engine-strict": true,
   "version": "0.1.0",
   "scripts": {
     "start": "node ./app"
