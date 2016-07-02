@@ -7,7 +7,8 @@
   },
   "engine-strict": true,
   "scripts": {
-    "start": "node ./app"
+    "start": "node ./app",
+    "test": "mocha ./test/spec-helper.js ./models/**/*.spec.js"
   },
   "dependencies": {
     "axios": "^0.11.0",
