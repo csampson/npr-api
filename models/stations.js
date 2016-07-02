@@ -13,7 +13,7 @@ database.connect({ db: 'radio_api' })
   .then(conn => { connection = conn; })
   .catch(err => { throw new Error(err); });
 
-function run() {
+function queryStations() {
   return database.table('stations').run(connection);
 }
 
@@ -23,9 +23,21 @@ class Stations {
    * @returns {Promise} Fetch operation
    */
   static fetch() {
-    return run()
+    return queryStations()
       .then(cursor => (
-        cursor.toArray()
+        // Manually convert ReQL `@geolocation` to GeoJSON
+        cursor.toArray().map(station => {
+          if (station.geolocation) {
+            station.geolocation = {
+              geolocation: {
+                coordinates: station.geolocation.coordinates,
+                type: station.geolocation.type
+              }
+            };
+          }
+
+          return station;
+        })
       ))
       .catch(err => (
         Promise.reject(new Error('Failed to run database query for `Stations::fetch`'))

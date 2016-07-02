@@ -10,6 +10,9 @@ const sandbox = sinon.sandbox.create();
 const mocks   = {
   normalizedStations: [
     { title: '<title>',  geolocation: { type: 'Point', coordinates: [90, -90] } }
+  ],
+  rawStations: [
+    { title: '<title>', geolocation: { type: 'Point', coordinates: [90, -90], __raw_field__: null } }
   ]
 };
 
@@ -50,6 +53,12 @@ describe('Stations', () => {
       it('should reject with an [Error]', () => {
         setupSandbox({ succeed: false });
         return Stations.fetch().should.eventually.be.rejectedWith(Error);
+      });
+    });
+
+    context('when a station object includes the `geolocation` property', () => {
+      it('should normalize `geolocation`', () => {
+        setupSandbox({ stations: mocks.rawStations });
       });
     });
   });
