@@ -8,7 +8,9 @@
   "engine-strict": true,
   "scripts": {
     "start": "node ./app",
-    "test": "mocha ./test/spec-helper.js ./models/**/*.spec.js"
+    "test": "mocha ./test/spec-helper.js ./models/**/*.spec.js",
+    "import-data": "node ./scripts/import-npr-stations",
+    "db:migrate": "rethinkdb-migrate"
   },
   "dependencies": {
     "axios": "^0.11.0",
