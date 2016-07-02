@@ -3,3 +3,6 @@ data
 # Node.js
 *npm-debug.log
 node_modules
+
+# Dev tools
+.vscode
