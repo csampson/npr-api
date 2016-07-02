@@ -6,17 +6,26 @@ const rethinkdb = require('rethinkdb');
 const sinon     = require('sinon');
 const Stations  = require('./stations');
 
-const sandbox      = sinon.sandbox.create();
-const mockStations = [
-  { title: '<title>' }
-];
+const sandbox = sinon.sandbox.create();
+const mocks   = {
+  normalizedStations: [
+    { title: '<title>',  geolocation: { type: 'Point', coordinates: [90, -90] } }
+  ]
+};
 
 function setupSandbox(options) {
   const database = {};
 
+  options = Object.assign({
+    stations: mocks.normalizedStations,
+    succeed: true
+  }, options);
+
   if (options.succeed) {
     database.run = sinon.stub().resolves({
-      toArray: sinon.stub().resolves(mockStations)
+      toArray: sinon.stub().returns({
+        map: sinon.stub().returns(options.stations)
+      })
     });
   } else {
     database.run = sinon.stub().rejects();
@@ -33,13 +42,15 @@ describe('Stations', () => {
 
   describe('#fetch', () => {
     it('should resolve with an [Array] of stations', () => {
-      setupSandbox({ succeed: true });
-      return Stations.fetch().should.eventually.become(mockStations);
+      setupSandbox();
+      return Stations.fetch().should.eventually.become(mocks.normalizedStations);
     });
 
-    it('should reject with an [Error] if the database query fails', () => {
-      setupSandbox({ succeed: false });
-      return Stations.fetch().should.eventually.be.rejectedWith(Error);
+    context('when the database query fails', () => {
+      it('should reject with an [Error]', () => {
+        setupSandbox({ succeed: false });
+        return Stations.fetch().should.eventually.be.rejectedWith(Error);
+      });
     });
   });
 });
