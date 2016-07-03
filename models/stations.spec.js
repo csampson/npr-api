@@ -26,9 +26,7 @@ function setupSandbox(options) {
 
   if (options.succeed) {
     database.run = sinon.stub().resolves({
-      toArray: sinon.stub().returns({
-        map: sinon.stub().returns(options.stations)
-      })
+      toArray: sinon.stub().returns(options.stations)
     });
   } else {
     database.run = sinon.stub().rejects();
@@ -43,7 +41,7 @@ describe('Stations', () => {
     sandbox.restore();
   });
 
-  describe('#fetch', () => {
+  describe('::fetch', () => {
     it('should resolve with an [Array] of stations', () => {
       setupSandbox();
       return Stations.fetch().should.eventually.become(mocks.normalizedStations);
@@ -59,6 +57,7 @@ describe('Stations', () => {
     context('when a station object includes the `geolocation` property', () => {
       it('should normalize `geolocation`', () => {
         setupSandbox({ stations: mocks.rawStations });
+        return Stations.fetch().should.eventually.become(mocks.normalizedStations);
       });
     });
   });
