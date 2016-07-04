@@ -8,8 +8,10 @@ module.exports = [
     method: 'GET',
     path: '/stations',
     handler: (request, reply) => {
+      const filter  = request.query.filter ? new Map(request.query.filter.split(';').map(f => f.split(':'))) : null;
       const options = {
-        page: request.query.page
+        page: request.query.page,
+        filter
       };
 
       Stations.fetch(options)
