@@ -17,7 +17,7 @@ module.exports = [
       Stations.fetch(options)
         .then(reply)
         .catch(err => {
-          Boom.wrap(err, 500);
+          reply(Boom.wrap(err, 500));
         });
     }
   }
