@@ -30,6 +30,10 @@ function createFilter(params) {
 function unmarshal(cursor) {
   // Manually convert ReQL `@geolocation` to GeoJSON
   return cursor.toArray().map(station => {
+    if ('doc' in station) {
+      station = station.doc;
+    }
+
     if (station.geolocation) {
       station.geolocation = {
         geolocation: {
