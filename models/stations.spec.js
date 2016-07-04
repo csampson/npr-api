@@ -25,11 +25,15 @@ function setupSandbox(options) {
   }, options);
 
   if (options.succeed) {
-    database.run = sinon.stub().resolves({
-      toArray: sinon.stub().returns(options.stations)
+    database.slice = sinon.stub().returns({
+      run: sinon.stub().resolves({
+        toArray: sinon.stub().returns(options.stations)
+      })
     });
   } else {
-    database.run = sinon.stub().rejects();
+    database.slice = sinon.stub().returns({
+      run: sinon.stub().rejects()
+    });
   }
 
   sandbox.stub(rethinkdb, 'connect').resolves();

@@ -718,11 +718,6 @@
       "from": "isarray@>=1.0.0 <1.1.0",
       "resolved": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
     },
-    "isemail": {
-      "version": "2.2.0",
-      "from": "isemail@>=2.0.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/isemail/-/isemail-2.2.0.tgz"
-    },
     "isobject": {
       "version": "0.2.0",
       "from": "isobject@>=0.2.0 <0.3.0",
@@ -744,11 +739,6 @@
           "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.0.tgz"
         }
       }
-    },
-    "joi": {
-      "version": "8.4.2",
-      "from": "joi@>=8.0.5 <9.0.0",
-      "resolved": "https://registry.npmjs.org/joi/-/joi-8.4.2.tgz"
     },
     "js-yaml": {
       "version": "3.6.1",
@@ -1263,11 +1253,6 @@
       "version": "0.0.2",
       "from": "to-iso-string@0.0.2",
       "resolved": "https://registry.npmjs.org/to-iso-string/-/to-iso-string-0.0.2.tgz"
-    },
-    "topo": {
-      "version": "2.0.1",
-      "from": "topo@2.x.x",
-      "resolved": "https://registry.npmjs.org/topo/-/topo-2.0.1.tgz"
     },
     "trim-newlines": {
       "version": "1.0.0",
