@@ -15,15 +15,13 @@ database.connect({ db: 'radio_api' })
   .then(conn => { connection = conn; })
   .catch(err => { throw new Error(err); });
 
-function filter(params) {
-  if (!params) {
-    return null;
-  }
-
+function createFilter(params) {
   let predicate;
 
   params.forEach((value, param) => {
-    predicate = predicate ? predicate.and(database.row(param).match(`(?i)${value}`)) : database.row(param).match(`(?i)${value}`);
+    if (param !== 'geolocation') {
+      predicate = predicate ? predicate.and(database.row(param).match(`(?i)${value}`)) : database.row(param).match(`(?i)${value}`);
+    }
   });
 
   return predicate;
@@ -53,9 +51,20 @@ class Stations {
    * @param   {Map}    options.filter - Filtering options
    * @returns {Promise} Fetch operation
    */
-  static fetch(options = {}) {
+  static fetch(options = { page: 1 }) {
+    let query = database.table('stations');
     let first;
     let last;
+
+    if (options.filter) {
+      const filter = createFilter(options.filter);
+      query = filter ? query.filter(filter) : query;
+    }
+
+    if (options.filter && options.filter.has('geolocation')) {
+      const [longitude, latitude] = options.filter.get('geolocation').split(',');
+      query = query.getNearest(database.point(+longitude, +latitude), { index: 'geolocation' });
+    }
 
     if (options.page > 1) {
       first = (options.page - 1) * LIMIT;
@@ -65,14 +74,13 @@ class Stations {
       last  = LIMIT;
     }
 
-    return database.table('stations')
-      .filter(filter(options.filter))
+    return query
       .slice(first, last)
       .run(connection)
       .then(unmarshal)
-      .catch(err => (
+      .catch(err => {
         Promise.reject(new Error('Failed to run database query for `Stations::fetch`'))
-      ));
+      });
   }
 }
 
