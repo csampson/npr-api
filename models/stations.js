@@ -9,13 +9,18 @@
 const database = require('rethinkdb');
 const LIMIT    = 30;
 
-let connection;
+let databaseConnection;
 
-database.connect({ db: 'radio_api' })
-  .then(conn => { connection = conn; })
-  .catch(err => { throw new Error(err); });
+function connect() {
+  if (!databaseConnection) {
+    return database.connect({ db: 'radio_api' })
+      .catch(err => { throw new Error(err); });
+  }
 
-function createFilter(params) {
+  return Promise.resolve(databaseConnection);
+}
+
+function buildFilter(params) {
   let predicate;
 
   params.forEach((value, param) => {
@@ -56,34 +61,40 @@ class Stations {
    * @returns {Promise} Fetch operation
    */
   static fetch(options = { page: 1 }) {
-    let query = database.table('stations');
-    let first;
-    let last;
+    return connect()
+      .then(connection => {
+        let query = database.table('stations');
+        let first;
+        let last;
 
-    if (options.filter) {
-      const filter = createFilter(options.filter);
-      query = filter ? query.filter(filter) : query;
-    }
+        if (options.filter) {
+          const filter = buildFilter(options.filter);
+          query = filter ? query.filter(filter) : query;
+        }
 
-    if (options.filter && options.filter.has('geolocation')) {
-      const [longitude, latitude] = options.filter.get('geolocation').split(',');
-      query = query.getNearest(database.point(+longitude, +latitude), { index: 'geolocation' });
-    }
+        if (options.filter && options.filter.has('geolocation')) {
+          const [longitude, latitude] = options.filter.get('geolocation').split(',');
+          query = query.getNearest(database.point(+longitude, +latitude), { index: 'geolocation' });
+        }
 
-    if (options.page > 1) {
-      first = (options.page - 1) * LIMIT;
-      last  = first + (LIMIT);
-    } else {
-      first = 0;
-      last  = LIMIT;
-    }
+        if (options.page > 1) {
+          first = (options.page - 1) * LIMIT;
+          last  = first + (LIMIT);
+        } else {
+          first = 0;
+          last  = LIMIT;
+        }
 
-    return query
-      .slice(first, last)
-      .run(connection)
-      .then(unmarshal)
+        return query
+          .slice(first, last)
+          .run(connection)
+          .then(unmarshal)
+          .catch(err => {
+            Promise.reject(new Error('Failed to run database query for `Stations::fetch`'));
+          });
+      })
       .catch(err => {
-        Promise.reject(new Error('Failed to run database query for `Stations::fetch`'))
+        return Promise.reject(new Error('Failed to run database query for `Stations::fetch`'));
       });
   }
 }
