@@ -16,7 +16,7 @@ const mocks   = {
   ]
 };
 
-function setupSandbox(options) {
+function setupSandbox(options = {}) {
   const database = {};
 
   options = Object.assign({
@@ -30,13 +30,16 @@ function setupSandbox(options) {
         toArray: sinon.stub().returns(options.stations)
       })
     });
+
+    sandbox.stub(rethinkdb, 'connect').resolves({});
   } else {
     database.slice = sinon.stub().returns({
       run: sinon.stub().rejects()
     });
+
+    sandbox.stub(rethinkdb, 'connect').rejects();
   }
 
-  sandbox.stub(rethinkdb, 'connect').resolves();
   sandbox.stub(rethinkdb, 'table').returns(database);
 }
 
@@ -51,7 +54,7 @@ describe('Stations', () => {
       return Stations.fetch().should.eventually.become(mocks.normalizedStations);
     });
 
-    context('when the database query fails', () => {
+    context('when the database connection fails', () => {
       it('should reject with an [Error]', () => {
         setupSandbox({ succeed: false });
         return Stations.fetch().should.eventually.be.rejectedWith(Error);
