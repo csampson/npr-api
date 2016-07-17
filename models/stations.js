@@ -77,6 +77,10 @@ class Stations {
           query = query.getNearest(database.point(+longitude, +latitude), { index: 'geolocation' });
         }
 
+        if (options.sort) {
+          query = query.orderBy(options.sort);
+        }
+
         if (options.page > 1) {
           first = (options.page - 1) * LIMIT;
           last  = first + (LIMIT);
