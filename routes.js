@@ -11,6 +11,7 @@ module.exports = [
       const filter  = request.query.filter ? new Map(request.query.filter.split(';').map(f => f.split(':'))) : null;
       const options = {
         page: request.query.page,
+        sort: request.query.sort,
         filter
       };
 
