@@ -83,13 +83,10 @@ class Stations {
         return query
           .slice(first, last)
           .run(connection)
-          .then(unmarshal)
-          .catch(err => (
-            Promise.reject(new Error('Failed to run database query for `Stations::fetch`'))
-          ));
+          .then(unmarshal);
       })
       .catch(err => (
-        Promise.reject(new Error('Failed to connect to database for `Stations::fetch`'))
+        Promise.reject(new Error('Failed to execute `Stations::fetch`'))
       ));
   }
 }

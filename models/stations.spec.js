@@ -31,6 +31,7 @@ function setupSandbox(options = {}) {
       })
     };
 
+    database.filter  = sandbox.stub().returns(database);
     database.orderBy = sandbox.stub().returns(database);
     database.slice   = sandbox.stub().returns(database);
 
@@ -60,7 +61,18 @@ describe('Stations', () => {
       it('should sort by the given property', () => {
         setupSandbox();
         return Stations.fetch({ sort: 'title' }).then(res => (
-          database.orderBy.should.have.been.called
+          database.orderBy.should.have.been.calledWith('title')
+        ));
+      });
+    });
+
+    context('when the `filter` param is specified', () => {
+      it('should filter by the given property', () => {
+        const filter = new Map().set('property', 'value');
+        setupSandbox();
+
+        return Stations.fetch({ filter }).then(res => (
+          database.filter.should.have.been.called
         ));
       });
     });
