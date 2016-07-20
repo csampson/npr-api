@@ -16,34 +16,36 @@ const mocks   = {
   ]
 };
 
-function setupSandbox(options = {}) {
-  const database = {};
+let database;
 
+function setupSandbox(options = {}) {
   options = Object.assign({
     stations: mocks.normalizedStations,
     succeed: true
   }, options);
 
   if (options.succeed) {
-    database.slice = sinon.stub().returns({
-      run: sinon.stub().resolves({
-        toArray: sinon.stub().returns(options.stations)
+    database = {
+      run: sandbox.stub().resolves({
+        toArray: sandbox.stub().returns(options.stations)
       })
-    });
+    };
 
+    database.orderBy = sandbox.stub().returns(database);
+    database.slice   = sandbox.stub().returns(database);
+
+    sandbox.stub(rethinkdb, 'table').returns(database);
     sandbox.stub(rethinkdb, 'connect').resolves({});
   } else {
-    database.slice = sinon.stub().returns({
-      run: sinon.stub().rejects()
-    });
-
-    sandbox.stub(rethinkdb, 'connect').rejects();
+    sandbox.stub(rethinkdb, 'connect').rejects(Error);
   }
-
-  sandbox.stub(rethinkdb, 'table').returns(database);
 }
 
 describe('Stations', () => {
+  beforeEach(() => {
+    database = {};
+  });
+
   afterEach(() => {
     sandbox.restore();
   });
@@ -54,10 +56,12 @@ describe('Stations', () => {
       return Stations.fetch().should.eventually.become(mocks.normalizedStations);
     });
 
-    context('when the database connection fails', () => {
-      it('should reject with an [Error]', () => {
-        setupSandbox({ succeed: false });
-        return Stations.fetch().should.eventually.be.rejectedWith(Error);
+    context('when the `sort` param is specified', () => {
+      it('should sort by the given property', () => {
+        setupSandbox();
+        return Stations.fetch({ sort: 'title' }).then(res => (
+          database.orderBy.should.have.been.called
+        ));
       });
     });
 
@@ -65,6 +69,13 @@ describe('Stations', () => {
       it('should normalize `geolocation`', () => {
         setupSandbox({ stations: mocks.rawStations });
         return Stations.fetch().should.eventually.become(mocks.normalizedStations);
+      });
+    });
+
+    context('when the database connection fails', () => {
+      it('should reject with an [Error]', () => {
+        setupSandbox({ succeed: false });
+        return Stations.fetch().should.eventually.be.rejectedWith(Error);
       });
     });
   });
