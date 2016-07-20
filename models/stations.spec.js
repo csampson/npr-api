@@ -60,15 +60,15 @@ describe('Stations', () => {
     context('when the `sort` param is specified', () => {
       it('should sort by the given property', () => {
         setupSandbox();
-        return Stations.fetch({ sort: 'title' }).then(res => (
-          database.orderBy.should.have.been.calledWith('title')
+        return Stations.fetch({ sort: '<value>' }).then(res => (
+          database.orderBy.should.have.been.calledWith('<value>')
         ));
       });
     });
 
     context('when the `filter` param is specified', () => {
       it('should filter by the given property', () => {
-        const filter = new Map().set('property', 'value');
+        const filter = new Map().set('<property>', '<value>');
         setupSandbox();
 
         return Stations.fetch({ filter }).then(res => (
