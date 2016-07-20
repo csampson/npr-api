@@ -9,15 +9,8 @@
 const database = require('rethinkdb');
 const LIMIT    = 30;
 
-let databaseConnection;
-
 function connect() {
-  if (!databaseConnection) {
-    return database.connect({ db: 'radio_api' })
-      .catch(err => { throw new Error(err); });
-  }
-
-  return Promise.resolve(databaseConnection);
+  return database.connect({ db: 'radio_api' });
 }
 
 function buildFilter(params) {
@@ -41,10 +34,8 @@ function unmarshal(cursor) {
 
     if (station.geolocation) {
       station.geolocation = {
-        geolocation: {
-          coordinates: station.geolocation.coordinates,
-          type: station.geolocation.type
-        }
+        coordinates: station.geolocation.coordinates,
+        type: station.geolocation.type
       };
     }
 
@@ -93,13 +84,13 @@ class Stations {
           .slice(first, last)
           .run(connection)
           .then(unmarshal)
-          .catch(err => {
-            Promise.reject(new Error('Failed to run database query for `Stations::fetch`'));
-          });
+          .catch(err => (
+            Promise.reject(new Error('Failed to run database query for `Stations::fetch`'))
+          ));
       })
-      .catch(err => {
-        return Promise.reject(new Error('Failed to run database query for `Stations::fetch`'));
-      });
+      .catch(err => (
+        Promise.reject(new Error('Failed to connect to database for `Stations::fetch`'))
+      ));
   }
 }
 
