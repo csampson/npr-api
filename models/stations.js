@@ -9,8 +9,18 @@
 const database = require('rethinkdb');
 const LIMIT    = 30;
 
+let connection;
+
 function connect() {
-  return database.connect({ db: 'radio_api' });
+  if (connection) {
+    return Promise.resolve(connection);
+  }
+
+
+  return database.connect({ db: 'radio_api' }).then(res => {
+    connection = res;
+    return connection;
+  });
 }
 
 function buildFilter(params) {
