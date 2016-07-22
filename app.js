@@ -2,6 +2,7 @@
  * @overview  Application entry-point
  * @module    app
  * @requires  hapi
+ * @requires  logger
  * @requires  newrelic
  * @requires  routes
  */
@@ -15,6 +16,7 @@
 require('newrelic');
 
 const Hapi   = require('hapi');
+const logger = require('./lib/logger');
 const routes = require('./routes');
 
 const server     = new Hapi.Server();
@@ -22,10 +24,11 @@ const connection = { port: process.env.APP_PORT || 3000 };
 
 function init(err) {
   if (err) {
+    logger.fatal(err);
     throw new Error(err);
   }
 
-  console.log(`Server running at: ${server.info.uri}`);
+  logger.info(`Server running at: ${server.info.uri}`);
 }
 
 server.connection(connection);

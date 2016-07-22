@@ -8,13 +8,14 @@
   "engine-strict": true,
   "scripts": {
     "start": "node ./app",
-    "test": "mocha ./test/spec-helper.js ./models/**/*.spec.js",
+    "test": "mocha ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
     "import-data": "node ./scripts/import-npr-stations",
     "db:migrate": "rethinkdb-migrate"
   },
   "dependencies": {
     "axios": "^0.11.0",
     "boom": "^3.1.2",
+    "bunyan": "^1.8.1",
     "hapi": "^13.3.0",
     "nconf": "^0.8.4",
     "newrelic": "^1.28.3",

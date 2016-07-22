@@ -1,11 +1,13 @@
 /**
  * @overview Stations table interface
  * @module   stations
+ * @requires logger
  * @requires rethinkdb
  */
 
 'use strict';
 
+const logger   = require('../lib/logger');
 const database = require('rethinkdb');
 const LIMIT    = 30;
 
@@ -95,9 +97,12 @@ class Stations {
           .run(connection)
           .then(unmarshal);
       })
-      .catch(err => (
-        Promise.reject(new Error('Failed to execute `Stations::fetch`'))
-      ));
+      .catch(err => {
+        const error = new Error('Failed to execute `Stations::fetch`');
+
+        logger.error(error.message);
+        return Promise.reject(error);
+      });
   }
 }
 
