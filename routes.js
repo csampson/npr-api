@@ -1,14 +1,35 @@
 'use strict';
 
 const Boom     = require('boom');
+const Joi      = require('joi');
+const toPairs  = require('lodash/toPairs');
+
 const Stations = require('./models/stations');
 
 module.exports = [
   {
     method: 'GET',
     path: '/stations',
+    config: {
+      validate: {
+        query: {
+          filter: Joi.object().keys({
+            abbreviation: Joi.string(),
+            band: Joi.string(),
+            call: Joi.string(),
+            format: Joi.string(),
+            frequency: Joi.number(),
+            market_city: Joi.string(),
+            market_state: Joi.string(),
+            name: Joi.string(),
+            tagline: Joi.string(),
+            title: Joi.string()
+          })
+        }
+      }
+    },
     handler: (request, reply) => {
-      const filter  = request.query.filter ? new Map(request.query.filter.split(';').map(f => f.split(':'))) : null;
+      const filter  = request.query.filter ? new Map(toPairs(request.query.filter)) : null;
       const options = {
         page: request.query.page,
         sort: request.query.sort,
