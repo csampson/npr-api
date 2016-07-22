@@ -11,6 +11,8 @@ module.exports = [
     method: 'GET',
     path: '/stations',
     config: {
+      description: 'Fetch a collection of NPR member station records',
+      tags: ['api'],
       validate: {
         query: {
           filter: Joi.object().keys({
