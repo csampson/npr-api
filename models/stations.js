@@ -76,8 +76,8 @@ class Stations {
         }
 
         if (options.filter && options.filter.has('geolocation')) {
-          const [longitude, latitude] = options.filter.get('geolocation').split(',');
-          query = query.getNearest(database.point(+longitude, +latitude), { index: 'geolocation' });
+          const [latitude, longitude] = options.filter.get('geolocation');
+          query = query.getNearest(database.point(longitude, latitude), { index: 'geolocation' });
         }
 
         if (options.sort) {
@@ -100,7 +100,7 @@ class Stations {
       .catch(err => {
         const error = new Error('Failed to execute `Stations::fetch`');
 
-        logger.error(error.message);
+        logger.error(error);
         return Promise.reject(error);
       });
   }
