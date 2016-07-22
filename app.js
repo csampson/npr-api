@@ -1,14 +1,19 @@
 /**
  * @overview  Application entry-point
  * @module    app
- * @requires  boom
  * @requires  hapi
+ * @requires  newrelic
  * @requires  routes
  */
 
 'use strict';
 
-const Boom   = require('boom');
+/**
+ * Hooks Newrelic monitoring up from this point forward
+ * @see {@link https://docs.newrelic.com/docs/agents/nodejs-agent/installation-configuration/install-nodejs-agent}
+ */
+require('newrelic');
+
 const Hapi   = require('hapi');
 const routes = require('./routes');
 

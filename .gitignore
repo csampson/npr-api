@@ -1,6 +1,12 @@
+# App
+config/secrets.json
+
 # Node.js
 *npm-debug.log
 node_modules
 
 # Dev tools
 .vscode
+
+# Ops
+newrelic_agent.log
