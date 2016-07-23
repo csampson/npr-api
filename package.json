@@ -10,7 +10,7 @@
     "start": "node ./app",
     "test": "mocha ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
     "import-data": "node ./scripts/import-npr-stations",
-    "db:migrate": "rethinkdb-migrate"
+    "db:migrate": "rethink-migrate"
   },
   "dependencies": {
     "axios": "^0.11.0",
