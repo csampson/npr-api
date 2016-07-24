@@ -89,7 +89,7 @@ class Stations {
       .catch(err => {
         const error = new Error('Failed to execute `Stations::fetch`');
 
-        logger.error(error);
+        logger.error(err);
         return Promise.reject(error);
       });
   }
