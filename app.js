@@ -1,4 +1,4 @@
-/* eslint global-require: warn */
+/* eslint global-require: off */
 
 /**
  * @overview  Application entry-point
