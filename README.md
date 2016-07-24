@@ -1,4 +1,4 @@
-# public-radio-api
+# public-radio-api [![Build Status](https://travis-ci.org/csampson/public-radio-api.svg?branch=task%2Ftravis-ci-integration)](https://travis-ci.org/csampson/public-radio-api)
 
 This a REST api that provides a list of all [NPR](http://npr.org) member stations.
 
