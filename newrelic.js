@@ -1,4 +1,4 @@
-const environment = require('./config/environment');
+const environment = require('./lib/environment');
 
 'use strict';
 
