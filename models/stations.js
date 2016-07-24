@@ -1,36 +1,25 @@
 /**
  * @overview Stations table interface
  * @module   stations
+ * @requires database
  * @requires logger
- * @requires rethinkdb
  */
 
 'use strict';
 
+const database = require('../lib/database');
 const logger   = require('../lib/logger');
-const database = require('rethinkdb');
-const LIMIT    = 30;
 
-let connection;
-
-function connect() {
-  if (connection) {
-    return Promise.resolve(connection);
-  }
-
-
-  return database.connect({ db: 'radio_api' }).then(res => {
-    connection = res;
-    return connection;
-  });
-}
+const LIMIT = 30;
 
 function buildFilter(params) {
   let predicate;
 
   params.forEach((value, param) => {
     if (param !== 'geolocation') {
-      predicate = predicate ? predicate.and(database.row(param).match(`(?i)${value}`)) : database.row(param).match(`(?i)${value}`);
+      predicate = predicate
+        ? predicate.and(database.interface.row(param).match(`(?i)${value}`))
+        : database.interface.row(param).match(`(?i)${value}`);
     }
   });
 
@@ -64,9 +53,9 @@ class Stations {
    * @returns {Promise} Fetch operation
    */
   static fetch(options = { page: 1 }) {
-    return connect()
+    return database.connect()
       .then(connection => {
-        let query = database.table('stations');
+        let query = database.interface.table('stations');
         let first;
         let last;
 
@@ -77,7 +66,7 @@ class Stations {
 
         if (options.filter && options.filter.has('geolocation')) {
           const [latitude, longitude] = options.filter.get('geolocation');
-          query = query.getNearest(database.point(longitude, latitude), { index: 'geolocation' });
+          query = query.getNearest(database.interface.point(longitude, latitude), { index: 'geolocation' });
         }
 
         if (options.sort) {
