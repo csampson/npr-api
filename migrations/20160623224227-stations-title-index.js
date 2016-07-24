@@ -1,13 +1,18 @@
+/* eslint-disable no-console */
+
 'use strict';
 
 function createIndex(database, connection) {
   console.log('Adding `title` index to `stations` table...');
 
   return new Promise((resolve, reject) => {
-    database.db('radio_api').table('stations').indexCreate('title').run(connection, results => {
-      console.log('...done');
-      resolve();
-    });
+    database.db('radio_api')
+      .table('stations')
+      .indexCreate('title')
+      .run(connection, results => {
+        console.log('...done');
+        resolve();
+      });
   });
 }
 
@@ -15,10 +20,13 @@ function deleteIndex(database, connection) {
   console.log('Delete `title` index from `stations` table...');
 
   return new Promise((resolve, reject) => {
-    database.db('radio_api').table('stations').indexDrop('title').run(connection, results => {
-      console.log('...done');
-      resolve();
-    });
+    database.db('radio_api')
+      .table('stations')
+      .indexDrop('title')
+      .run(connection, results => {
+        console.log('...done');
+        resolve();
+      });
   });
 }
 
