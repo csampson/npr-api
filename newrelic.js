@@ -1,6 +1,6 @@
-const environment = require('./lib/environment');
-
 'use strict';
+
+const environment = require('./lib/environment');
 
 module.exports.config = {
   app_name: ['public-radio-api'],
