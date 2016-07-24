@@ -1,3 +1,5 @@
+/* eslint global-require: warn */
+
 /**
  * @overview  Application entry-point
  * @module    app
@@ -16,7 +18,10 @@
  * Hooks Newrelic monitoring up from this point forward
  * @see {@link https://docs.newrelic.com/docs/agents/nodejs-agent/installation-configuration/install-nodejs-agent}
  */
-require('newrelic');
+
+if (process.env.NODE_ENV === 'production') {
+  require('newrelic');
+}
 
 const Hapi        = require('hapi');
 const Inert       = require('inert');
