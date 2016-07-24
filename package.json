@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node ./app",
     "test": "mocha ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
+    "test:ci": "istanbul cover _mocha --report lcovonly -- -R spec ./test/spec-helper.js ./{lib,models}/**/*.spec.js && cat ./coverage/lcov.info | coveralls",
     "import-data": "node ./scripts/import-npr-stations",
     "db:migrate": "rethink-migrate"
   },
@@ -30,12 +31,15 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
+    "coveralls": "^2.11.11",
     "eslint": "^2.12.0",
     "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-import": "^1.8.1",
     "eslint-plugin-jsx-a11y": "^1.4.2",
     "eslint-plugin-react": "^5.2.2",
+    "istanbul": "^0.4.4",
     "mocha": "^2.5.3",
+    "mocha-lcov-reporter": "^1.2.0",
     "sinon": "^1.17.4",
     "sinon-as-promised": "^4.0.0",
     "sinon-chai": "^2.8.0"
