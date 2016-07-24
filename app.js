@@ -28,7 +28,7 @@ const logger  = require('./lib/logger');
 const routes  = require('./routes');
 
 const server     = new Hapi.Server();
-const connection = { port: process.env.APP_PORT || 3000 };
+const connection = { port: process.env.PORT || 3000 };
 
 function init(err) {
   if (err) {
