@@ -2,9 +2,9 @@
 
 'use strict';
 
-const rethinkdb = require('rethinkdb');
-const sinon     = require('sinon');
-const Stations  = require('./stations');
+const sinon    = require('sinon');
+const database = require('../lib/database');
+const Stations = require('./stations');
 
 const sandbox = sinon.sandbox.create();
 const mocks   = {
@@ -16,7 +16,7 @@ const mocks   = {
   ]
 };
 
-let database;
+let db;
 
 function setupSandbox(options = {}) {
   options = Object.assign({
@@ -25,26 +25,26 @@ function setupSandbox(options = {}) {
   }, options);
 
   if (options.succeed) {
-    database = {
+    db = {
       run: sandbox.stub().resolves({
         toArray: sandbox.stub().returns(options.stations)
       })
     };
 
-    database.filter  = sandbox.stub().returns(database);
-    database.orderBy = sandbox.stub().returns(database);
-    database.slice   = sandbox.stub().returns(database);
+    db.filter  = sandbox.stub().returns(db);
+    db.orderBy = sandbox.stub().returns(db);
+    db.slice   = sandbox.stub().returns(db);
 
-    sandbox.stub(rethinkdb, 'table').returns(database);
-    sandbox.stub(rethinkdb, 'connect').resolves({});
+    sandbox.stub(database.interface, 'table').returns(db);
+    sandbox.stub(database, 'connect').resolves({});
   } else {
-    sandbox.stub(rethinkdb, 'connect').rejects(Error);
+    sandbox.stub(database, 'connect').rejects(Error);
   }
 }
 
 describe('Stations', () => {
   beforeEach(() => {
-    database = {};
+    db = {};
   });
 
   afterEach(() => {
@@ -61,7 +61,7 @@ describe('Stations', () => {
       it('should sort by the given property', () => {
         setupSandbox();
         return Stations.fetch({ sort: '<value>' }).then(res => (
-          database.orderBy.should.have.been.calledWith('<value>')
+          db.orderBy.should.have.been.calledWith('<value>')
         ));
       });
     });
@@ -72,7 +72,7 @@ describe('Stations', () => {
         setupSandbox();
 
         return Stations.fetch({ filter }).then(res => (
-          database.filter.should.have.been.called
+          db.filter.should.have.been.called
         ));
       });
     });
