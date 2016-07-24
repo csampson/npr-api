@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /**
  * @overview Creates `radio_api` database, `stations` table, content, and index
  * @requires fs
@@ -25,12 +27,12 @@ function createStationsTable(database, connection) {
     database.db('radio_api').tableCreate('stations').run(connection, results => {
       console.log('...done');
       resolve(results);
-    }); 
+    });
   });
 }
 
 function importStation(station) {
-  const content = fs.readFileSync(__dirname + `/../data/${station}`);
+  const content = fs.readFileSync(`${__dirname}/../data/${station}`);
   return JSON.parse(content.toString('utf8'));
 }
 
@@ -38,7 +40,7 @@ function importStations(database, connection) {
   console.log('Importing data into `stations`...');
 
   return new Promise((resolve, reject) => {
-    const files    = fs.readdirSync(__dirname + '/../data/');
+    const files    = fs.readdirSync(`${__dirname}/../data/`);
     const imports  = files.map(importStation);
 
     let stations = imports.reduce((prev, current) => prev.concat(current), []);
@@ -54,10 +56,13 @@ function importStations(database, connection) {
       return station;
     });
 
-    database.db('radio_api').table('stations').insert(stations).run(connection, results => {
-      console.log('...done');
-      resolve(results);
-    });
+    database.db('radio_api')
+      .table('stations')
+      .insert(stations)
+      .run(connection, results => {
+        console.log('...done');
+        resolve(results);
+      });
   });
 }
 
@@ -65,10 +70,13 @@ function indexGeolocations(database, connection) {
   console.log('Indexing `stations` geolocations...');
 
   return new Promise((resolve, reject) => {
-    database.db('radio_api').table('stations').indexCreate('geolocation', { geo: true }).run(connection, results => {
-      console.log('...done');
-      resolve(results);
-    });
+    database.db('radio_api')
+      .table('stations')
+      .indexCreate('geolocation', { geo: true })
+      .run(connection, results => {
+        console.log('...done');
+        resolve(results);
+      });
   });
 }
 
