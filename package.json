@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node ./app",
     "test": "mocha ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
-    "test:coverage": "istanbul cover _mocha --report lcovonly -- -R spec ./test/spec-helper.js ./{lib,models}/**/*.spec.js && cat ./coverage/lcov.info | coveralls",
+    "test:ci": "istanbul cover _mocha --report lcovonly -- -R spec ./test/spec-helper.js ./{lib,models}/**/*.spec.js && cat ./coverage/lcov.info | coveralls",
     "import-data": "node ./scripts/import-npr-stations",
     "db:migrate": "rethink-migrate"
   },
