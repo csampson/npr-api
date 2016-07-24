@@ -7,6 +7,8 @@
 [![bitHound Dev Dependencies](https://www.bithound.io/github/csampson/public-radio-api/badges/devDependencies.svg)](https://www.bithound.io/github/csampson/public-radio-api/master/dependencies/npm)
 [![bitHound Code](https://www.bithound.io/github/csampson/public-radio-api/badges/code.svg)](https://www.bithound.io/github/csampson/public-radio-api)
 
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/a66c9fc83d5c8395bd22#?env%5Bproduction%5D=W3sidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJwYmlfZW5kcG9pbnQiLCJ2YWx1ZSI6Imh0dHA6Ly9wdWJsaWMtcmFkaW8tYXBpLmhlcm9rdWFwcC5jb20ifV0=)
+
 This a REST api that provides a list of all [NPR](http://npr.org) member stations.
 
 ## Requirements
