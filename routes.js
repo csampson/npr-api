@@ -1,3 +1,12 @@
+/**
+ * @overview Hapi route configurations
+ * @module   routes
+ * @requires boom
+ * @requires joi
+ * @requires lodash/toPairs
+ * @requires stations
+ */
+
 'use strict';
 
 const Boom     = require('boom');
