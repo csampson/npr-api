@@ -10,8 +10,17 @@
 const database = require('../lib/database');
 const logger   = require('../lib/logger');
 
+/**
+ * Page result/size limit
+ * @type {number}
+ */
 const LIMIT = 30;
 
+/**
+ * Build a ReQL query object based on a given set of filters
+ * @param   {Object} params - Set of filter parameters
+ * @returns {Object} ReQL query object
+ */
 function buildFilter(params) {
   let predicate;
 
@@ -26,6 +35,11 @@ function buildFilter(params) {
   return predicate;
 }
 
+/**
+ * Provides consumer response -friendly representation of station objects
+ * @param   {Object} cursor - ReQL cursor object
+ * @returns {Array}  Collection of unmarshalled station objects
+ */
 function unmarshal(cursor) {
   // Manually convert ReQL `@geolocation` to GeoJSON
   return cursor.toArray().map(station => {
@@ -44,11 +58,15 @@ function unmarshal(cursor) {
   });
 }
 
+/**
+ * @class
+ */
 class Stations {
   /**
    * Fetches a set of all radio stations
    * @param   {Object} options        - Hashmap of fetch options
    * @param   {number} options.page   - Page number of stations to fetch
+   * @param   {string} options.sort   - Station attribute to sort by
    * @param   {Map}    options.filter - Filtering options
    * @returns {Promise} Fetch operation
    */
