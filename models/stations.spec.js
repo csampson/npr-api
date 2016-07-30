@@ -34,6 +34,7 @@ function setupSandbox(options = {}) {
     db.filter  = sandbox.stub().returns(db);
     db.orderBy = sandbox.stub().returns(db);
     db.slice   = sandbox.stub().returns(db);
+    db.count   = sandbox.stub().returns(db);
 
     sandbox.stub(database.interface, 'table').returns(db);
     sandbox.stub(database, 'connect').resolves({});
@@ -54,7 +55,11 @@ describe('Stations', () => {
   describe('::fetch', () => {
     it('should resolve with an [Array] of stations', () => {
       setupSandbox();
-      return Stations.fetch().should.eventually.become(mocks.normalizedStations);
+      return Stations.fetch().should.eventually.become({
+        pageCount: 1,
+        currentPage: 1,
+        stations: mocks.normalizedStations
+      });
     });
 
     context('when the `sort` param is specified', () => {
@@ -80,7 +85,11 @@ describe('Stations', () => {
     context('when a station object includes the `geolocation` property', () => {
       it('should normalize `geolocation`', () => {
         setupSandbox({ stations: mocks.rawStations });
-        return Stations.fetch().should.eventually.become(mocks.normalizedStations);
+        return Stations.fetch().should.eventually.become({
+          pageCount: 1,
+          currentPage: 1,
+          stations: mocks.normalizedStations
+        });
       });
     });
 

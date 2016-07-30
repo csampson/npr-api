@@ -12,8 +12,9 @@
 const Boom     = require('boom');
 const Joi      = require('joi');
 const toPairs  = require('lodash/toPairs');
-
 const Stations = require('./models/stations');
+
+const formatLinkHeader = require('format-link-header');
 
 module.exports = [
   {
@@ -51,7 +52,37 @@ module.exports = [
       };
 
       Stations.fetch(options)
-        .then(reply)
+        .then(results => {
+          const links     = {};
+          const prevPage  = (results.currentPage - 1) || null;
+          const nextPage  = results.pageCount - (results.pageCount - results.currentPage) + 1 || null;
+          const lastPage  = results.pageCount;
+          const endpoint  = `${request.server.info.protocol}://${request.info.host}${request.path}`;
+          const response  = reply(results.stations);
+
+          if (nextPage) {
+            links.next = {
+              rel: 'next',
+              url: `${endpoint}?page=${nextPage}`
+            };
+
+            links.last = {
+              rel: 'last',
+              url: `${endpoint}?page=${lastPage}`
+            };
+          }
+
+          if (prevPage) {
+            links.prev = {
+              rel: 'prev',
+              url: `${endpoint}?page=${prevPage}`
+            };
+          }
+
+          if (Object.keys(links).length) {
+            response.header('Links', formatLinkHeader(links));
+          }
+        })
         .catch(err => {
           reply(Boom.wrap(err, 500));
         });
