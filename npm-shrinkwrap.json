@@ -416,6 +416,11 @@
       "from": "escope@>=3.6.0 <4.0.0",
       "resolved": "https://registry.npmjs.org/escope/-/escope-3.6.0.tgz"
     },
+    "eslint-config-airbnb-base": {
+      "version": "3.0.1",
+      "from": "eslint-config-airbnb-base@>=3.0.0 <4.0.0",
+      "resolved": "https://registry.npmjs.org/eslint-config-airbnb-base/-/eslint-config-airbnb-base-3.0.1.tgz"
+    },
     "eslint-import-resolver-node": {
       "version": "0.2.1",
       "from": "eslint-import-resolver-node@>=0.2.0 <0.3.0",
@@ -539,6 +544,11 @@
       "version": "1.0.0-rc4",
       "from": "form-data@>=1.0.0-rc4 <1.1.0",
       "resolved": "https://registry.npmjs.org/form-data/-/form-data-1.0.0-rc4.tgz"
+    },
+    "format-link-header": {
+      "version": "1.0.0",
+      "from": "format-link-header@latest",
+      "resolved": "https://registry.npmjs.org/format-link-header/-/format-link-header-1.0.0.tgz"
     },
     "formatio": {
       "version": "1.1.1",
