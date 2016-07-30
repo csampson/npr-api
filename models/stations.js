@@ -100,9 +100,18 @@ class Stations {
         }
 
         return query
-          .slice(first, last)
+          .count()
           .run(connection)
-          .then(unmarshal);
+          .then(count => (
+            query.slice(first, last)
+              .run(connection)
+              .then(unmarshal)
+              .then(stations => ({
+                currentPage: options.page || 1,
+                pageCount: count > LIMIT ? Math.ceil(count / LIMIT) : 1,
+                stations
+              }))
+          ));
       })
       .catch(err => {
         const error = new Error('Failed to execute `Stations::fetch`');
