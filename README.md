@@ -1,11 +1,8 @@
 # public-radio-api
 
-[![Build Status](https://travis-ci.org/csampson/public-radio-api.svg?branch=task%2Ftravis-ci-integration)](https://travis-ci.org/csampson/public-radio-api)
-[![Coverage Status](https://coveralls.io/repos/github/csampson/public-radio-api/badge.svg?branch=task%2Fcode-coverage-report)](https://coveralls.io/github/csampson/public-radio-api?branch=task%2Fcode-coverage-report)
-[![bitHound Overall Score](https://www.bithound.io/github/csampson/public-radio-api/badges/score.svg)](https://www.bithound.io/github/csampson/public-radio-api)
-[![bitHound Dependencies](https://www.bithound.io/github/csampson/public-radio-api/badges/dependencies.svg)](https://www.bithound.io/github/csampson/public-radio-api/master/dependencies/npm)
-[![bitHound Dev Dependencies](https://www.bithound.io/github/csampson/public-radio-api/badges/devDependencies.svg)](https://www.bithound.io/github/csampson/public-radio-api/master/dependencies/npm)
-[![bitHound Code](https://www.bithound.io/github/csampson/public-radio-api/badges/code.svg)](https://www.bithound.io/github/csampson/public-radio-api)
+[![Build Status](https://travis-ci.org/publicradiotuner/api.svg?branch=master)](https://travis-ci.org/publicradiotuner/api)
+[![Coverage Status](https://coveralls.io/repos/github/publicradiotuner/api/badge.svg?branch=master)](https://coveralls.io/github/publicradiotuner/api?branch=master)
+[![bitHound Overall Score](https://www.bithound.io/github/publicradiotuner/api/badges/score.svg)](https://www.bithound.io/github/publicradiotuner/api)
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/a66c9fc83d5c8395bd22#?env%5Bproduction%5D=W3sidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJwYmlfZW5kcG9pbnQiLCJ2YWx1ZSI6Imh0dHA6Ly9wdWJsaWMtcmFkaW8tYXBpLmhlcm9rdWFwcC5jb20ifV0=)
 
