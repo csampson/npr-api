@@ -1,0 +1,137 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Public Radio Tuner API",
+        "description": "This a REST api for querying information about [NPR](http://npr.org) member stations. It features filtering, geolocation searching, pagination, and sorting.",
+        "version": "1.0.0"
+    },
+    "host": "api.publicradiotuner.io",
+    "schemes": [
+        "http"
+    ],
+    "basePath": "/",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/stations": {
+            "get": {
+                "summary": "Fetch a collection of NPR member station records",
+                "description": "When needed, pagination information will be encoded for you in the [Links header](https://www.w3.org/wiki/LinkHeader)\nin the response, e.g:\n```\n<http://api.publicradiotuner.io/stations?page=3>; rel=\"next\", <http://api.publicradiotuner.io/stations?page=29>; rel=\"last\", <http://api.publicradiotuner.io/stations?page=1>; rel=\"prev\"\n```\n",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filters the list of stations using key-value pairs of station attributes",
+                        "required": false,
+                        "type": "string",
+                        "format": "json"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorts the list of stations by a given station attribute value",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number to show stations from (page size is 30 items)",
+                        "type": "number",
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of NPR member stations",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Station"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Station": {
+            "type": "object",
+            "properties": {
+                "abbreviation": {
+                    "type": "string",
+                    "description": "A combination of station callsign and band"
+                },
+                "address": {
+                    "type": "array",
+                    "description": "Mailing address of the station",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "band": {
+                    "type": "string",
+                    "description": "Broadcast band the station operates on"
+                },
+                "donation_url": {
+                    "type": "string",
+                    "description": "Webpage for making station pledges"
+                },
+                "fax": {
+                    "type": "string",
+                    "description": "Fax number of the station"
+                },
+                "format": {
+                    "type": "string",
+                    "description": "Programming format of the station"
+                },
+                "frequency": {
+                    "type": "number",
+                    "description": "Radio frequency the station broadcasts on"
+                },
+                "geolocation": {
+                    "type": "string",
+                    "description": "[GeoJSON](http://geojson.org) format location of the station"
+                },
+                "homepage": {
+                    "type": "string",
+                    "description": "URL for the station's website"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "GUID unique station identifier"
+                },
+                "logo": {
+                    "type": "string",
+                    "description": "URL for the station's logo image"
+                },
+                "market_city": {
+                    "type": "string",
+                    "description": "Station's media market (city)"
+                },
+                "market_state": {
+                    "type": "string",
+                    "description": "Station's media market (state)"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Station callsign"
+                },
+                "phone": {
+                    "type": "string",
+                    "description": "Phone number at which station management can be reached"
+                },
+                "stream_url": {
+                    "type": "string",
+                    "description": "URL for the station's live-streaming playlist - format varies by station (e.g. m3u)"
+                },
+                "tagline": {
+                    "type": "string",
+                    "description": "Station tagline"
+                }
+            }
+        }
+    }
+}
