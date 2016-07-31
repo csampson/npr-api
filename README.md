@@ -1,4 +1,4 @@
-# public-radio-api
+# Public Radio Tuner API
 
 [![Build Status](https://travis-ci.org/publicradiotuner/api.svg?branch=master)](https://travis-ci.org/publicradiotuner/api)
 [![Coverage Status](https://coveralls.io/repos/github/publicradiotuner/api/badge.svg?branch=master)](https://coveralls.io/github/publicradiotuner/api?branch=master)
