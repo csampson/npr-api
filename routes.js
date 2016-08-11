@@ -21,6 +21,7 @@ module.exports = [
     method: 'GET',
     path: '/stations',
     config: {
+      cors: true,
       description: 'Fetch a collection of NPR member station records',
       tags: ['api'],
       validate: {
