@@ -3,11 +3,11 @@
 <head>
     <link rel="stylesheet" href="main.css">
     <meta charset="UTF-8">
-    <title>Public Radio Tuner API</title>
+    <title>Open Broadcasting API</title>
 </head>
 <body>
 <div class="container">
-    <h1>Public Radio Tuner API</h1>
+    <h1>Open Broadcasting API</h1>
     <p><p>This a REST api for querying information about <a href="http://npr.org">NPR</a> member stations. It features filtering, geolocation searching, pagination, and sorting.</p>
     </p>
     
@@ -61,7 +61,7 @@
                     <section class="sw-operation-description">
                         <p>When needed, pagination information will be encoded for you in the <a href="https://www.w3.org/wiki/LinkHeader">Links header</a>
             in the response, e.g:</p>
-            <pre><code>&lt;<span class="hljs-keyword">http</span>://api.publicradiotuner.io/stations?page=<span class="hljs-number">3</span>&gt;; <span class="hljs-built_in">rel</span>=<span class="hljs-string">"next"</span>, &lt;<span class="hljs-keyword">http</span>://api.publicradiotuner.io/stations?page=<span class="hljs-number">29</span>&gt;; <span class="hljs-built_in">rel</span>=<span class="hljs-string">"last"</span>, &lt;<span class="hljs-keyword">http</span>://api.publicradiotuner.io/stations?page=<span class="hljs-number">1</span>&gt;; <span class="hljs-built_in">rel</span>=<span class="hljs-string">"prev"</span>
+            <pre><code>&lt;<span class="hljs-keyword">http</span>://api.openbroadcasting.io/stations?page=<span class="hljs-number">3</span>&gt;; <span class="hljs-built_in">rel</span>=<span class="hljs-string">"next"</span>, &lt;<span class="hljs-keyword">http</span>://api.openbroadcasting.io/stations?page=<span class="hljs-number">29</span>&gt;; <span class="hljs-built_in">rel</span>=<span class="hljs-string">"last"</span>, &lt;<span class="hljs-keyword">http</span>://api.openbroadcasting.io/stations?page=<span class="hljs-number">1</span>&gt;; <span class="hljs-built_in">rel</span>=<span class="hljs-string">"prev"</span>
             </code></pre>
                     </section>
                     
