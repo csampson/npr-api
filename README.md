@@ -1,8 +1,8 @@
 # Public Radio Tuner API
 
-[![Build Status](https://travis-ci.org/publicradiotuner/api.svg?branch=master)](https://travis-ci.org/publicradiotuner/api)
-[![Coverage Status](https://coveralls.io/repos/github/publicradiotuner/api/badge.svg?branch=master)](https://coveralls.io/github/publicradiotuner/api?branch=master)
-[![bitHound Overall Score](https://www.bithound.io/github/publicradiotuner/api/badges/score.svg)](https://www.bithound.io/github/publicradiotuner/api)
+[![Build Status](https://travis-ci.org/openbroadcasting/api.svg?branch=master)](https://travis-ci.org/openbroadcasting/api)
+[![Coverage Status](https://coveralls.io/repos/github/openbroadcasting/api/badge.svg?branch=master)](https://coveralls.io/github/openbroadcasting/api?branch=master)
+[![bitHound Overall Score](https://www.bithound.io/github/openbroadcasting/api/badges/score.svg)](https://www.bithound.io/github/openbroadcasting/api)
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/a66c9fc83d5c8395bd22#?env%5Bproduction%5D=W3sidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJwYmlfZW5kcG9pbnQiLCJ2YWx1ZSI6Imh0dHA6Ly9wdWJsaWMtcmFkaW8tYXBpLmhlcm9rdWFwcC5jb20ifV0=)
 
