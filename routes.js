@@ -9,12 +9,16 @@
 
 'use strict';
 
-const Boom     = require('boom');
-const Joi      = require('joi');
-const toPairs  = require('lodash/toPairs');
-const Stations = require('./models/stations');
-
+const Boom             = require('boom');
+const Joi              = require('joi');
+const toPairs          = require('lodash/toPairs');
+const Stations         = require('./models/stations');
+const stationsSchema   = require('./schemas/station');
 const formatLinkHeader = require('format-link-header');
+
+const schemas = {
+  station: stationsSchema
+};
 
 module.exports = [
   {
@@ -24,19 +28,7 @@ module.exports = [
       cors: true,
       validate: {
         query: {
-          filter: Joi.object().keys({
-            abbreviation: Joi.string(),
-            band: Joi.string(),
-            call: Joi.string(),
-            format: Joi.string(),
-            frequency: Joi.number(),
-            geolocation: Joi.array().items(Joi.number()),
-            market_city: Joi.string(),
-            market_state: Joi.string(),
-            name: Joi.string(),
-            tagline: Joi.string(),
-            title: Joi.string()
-          }),
+          filter: schemas.station,
           sort: Joi.string(),
           page: Joi.string()
         }
