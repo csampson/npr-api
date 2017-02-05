@@ -78,5 +78,29 @@ module.exports = [
           reply(Boom.wrap(err, 500));
         });
     }
+  },
+
+  {
+    method: 'GET',
+    path: '/stations/{id}',
+    config: {
+      cors: true,
+      validate: {
+        params: {
+          id: Joi.string().guid()
+        }
+      }
+    },
+    handler: (request, reply) => {
+      const filter = new Map().set('id', request.params.id);
+
+      Stations.fetch({ filter })
+        .then(results => {
+          reply(results.stations);
+        })
+        .catch(err => {
+          reply(Boom.wrap(err, 500));
+        });
+    }
   }
 ];
