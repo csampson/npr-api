@@ -1,12 +1,16 @@
 /**
  * @overview Stations table interface
  * @module   stations
+ * @requires axios
  * @requires database
  * @requires logger
+ * @requires url
  */
 
 'use strict';
 
+const axios    = require('axios');
+const url      = require('url');
 const database = require('../lib/database');
 const logger   = require('../lib/logger');
 
@@ -119,6 +123,30 @@ class Stations {
         logger.error(err);
         return Promise.reject(error);
       });
+  }
+
+  /**
+   * Fetches the media stream url for a given radio station
+   * @todo    This should resolve w/ a formal `stream` object instead of a string
+   * @param   {Object} station - Radio station object
+   * @returns {Promise} Fetch operation
+   */
+  static fetchStream(station) {
+    if (!station.stream_url) {
+      const error = new Error('Missing `station.stream_url` for `Stations::fetchStream`');
+      return Promise.reject(error);
+    }
+
+    // Grab the first url in the playlist response
+    return axios.get(station.stream_url).then(response => {
+      const content = response.data.split('\n');
+
+      /** @todo Move this to a function */
+      return content.find(line => {
+        const streamURL = url.parse(line);
+        return streamURL.protocol && streamURL.hostname;
+      });
+    });
   }
 }
 

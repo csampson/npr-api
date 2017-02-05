@@ -10,11 +10,11 @@
 'use strict';
 
 const Boom             = require('boom');
+const formatLinkHeader = require('format-link-header');
 const Joi              = require('joi');
 const toPairs          = require('lodash/toPairs');
 const Stations         = require('./models/stations');
 const stationsSchema   = require('./schemas/station');
-const formatLinkHeader = require('format-link-header');
 
 const schemas = {
   station: stationsSchema
@@ -42,6 +42,7 @@ module.exports = [
         filter
       };
 
+      /** @todo Document what's happening here */
       Stations.fetch(options)
         .then(results => {
           const links     = {};
@@ -94,9 +95,49 @@ module.exports = [
     handler: (request, reply) => {
       const filter = new Map().set('id', request.params.id);
 
+      /** @todo Document what's happening here */
       Stations.fetch({ filter })
         .then(results => {
-          reply(results.stations);
+          if (results.stations.length) {
+            reply(results.stations);
+          } else {
+            reply(Boom.notFound('Station record not found'));
+          }
+        })
+        .catch(err => {
+          reply(Boom.wrap(err, 500));
+        });
+    }
+  },
+
+  {
+    method: 'GET',
+    path: '/stations/{id}/stream',
+    config: {
+      cors: true,
+      validate: {
+        params: {
+          id: Joi.string().guid()
+        }
+      }
+    },
+    handler: (request, reply) => {
+      const filter = new Map().set('id', request.params.id);
+
+      /** @todo Document what's happening here */
+      Stations.fetch({ filter })
+        .then(results => {
+          if (results.stations.length) {
+            const [station] = results.stations;
+
+            if (station && station.stream_url) {
+              Stations.fetchStream(station).then(reply).catch(Boom.wrap);
+            } else {
+              reply(Boom.notFound('Station stream url not found'));
+            }
+          } else {
+            reply(Boom.notFound('Station record not found'));
+          }
         })
         .catch(err => {
           reply(Boom.wrap(err, 500));
