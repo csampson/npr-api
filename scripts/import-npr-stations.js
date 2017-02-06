@@ -45,8 +45,6 @@ function fetchStations(state) {
 
 function deserializeStations(stations) {
   return stations.map(station => {
-    const primaryStream = station.urls.find(s => s.primary_stream === 1);
-
     console.log(`Deserializing ${station.title}`);
 
     return {
@@ -66,7 +64,7 @@ function deserializeStations(stations) {
       phone: station.phone,
       phone_extension: station.phone_extension,
       fax: station.fax,
-      stream_url: primaryStream ? primaryStream.href : null,
+      stream_urls: station.stream_urls,
       homepage: station.homepage,
       donation_url: station.donation_url,
       logo: station.logo
