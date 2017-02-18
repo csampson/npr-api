@@ -19,6 +19,7 @@
     "bunyan": "^1.8.5",
     "format-link-header": "^2.0.0",
     "hapi": "^16.1.0",
+    "hapi-qs": "^1.1.2",
     "joi": "^10.2.2",
     "lodash": "^4.17.4",
     "nconf": "^0.8.4",

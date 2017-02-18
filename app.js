@@ -4,6 +4,7 @@
  * @overview  Application entry-point
  * @module    app
  * @requires  hapi
+ * @requires  hapi-qs
  * @requires  logger
  * @requires  newrelic
  * @requires  routes
@@ -21,6 +22,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const Hapi   = require('hapi');
+const HapiQS = require('hapi-qs');
 const logger = require('./lib/logger');
 const routes = require('./routes');
 
@@ -37,5 +39,6 @@ function init(err) {
 }
 
 server.connection(connection);
+server.register(HapiQS);
 server.route(routes);
 server.start(init);
