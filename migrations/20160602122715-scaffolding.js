@@ -47,7 +47,7 @@ function importStations(database, connection) {
 
     // Insert ReQL geospatial points
     stations = stations.map(station => {
-      if (station.geolocation.longitude) {
+      if (station.geolocation && station.geolocation.longitude) {
         station.geolocation = database.point(station.geolocation.longitude, station.geolocation.latitude);
       } else {
         station.geolocation = null;

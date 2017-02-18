@@ -64,7 +64,7 @@ function deserializeStations(stations) {
       phone: station.phone,
       phone_extension: station.phone_extension,
       fax: station.fax,
-      stream_urls: station.stream_urls,
+      urls: station.urls,
       homepage: station.homepage,
       donation_url: station.donation_url,
       logo: station.logo
