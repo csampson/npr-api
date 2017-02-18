@@ -47,7 +47,7 @@ module.exports = [
         .then(results => {
           const links     = {};
           const prevPage  = (results.currentPage - 1) || null;
-          const nextPage  = results.pageCount - (results.pageCount - results.currentPage) + 1 || null;
+          const nextPage  = (results.currentPage + 1) === results.pageCount ? null : results.currentPage + 1;
           const lastPage  = results.pageCount;
           const endpoint  = `${request.server.info.protocol}://${request.info.host}${request.path}`;
           const response  = reply(results.stations);

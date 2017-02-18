@@ -10,6 +10,7 @@
     "no-multi-spaces": 0,
     "no-underscore-dangle": ["error", { "allowAfterThis": true }],
     "quotes": [2, "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
-    "strict": [0, "global"]
+    "strict": [0, "global"],
+    "arrow-parens": "off"
   }
 }
