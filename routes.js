@@ -83,17 +83,17 @@ module.exports = [
 
   {
     method: 'GET',
-    path: '/stations/{id}',
+    path: '/stations/{title}',
     config: {
       cors: true,
       validate: {
         params: {
-          id: Joi.string().guid()
+          title: Joi.string()
         }
       }
     },
     handler: (request, reply) => {
-      const filter = new Map().set('id', request.params.id);
+      const filter = new Map().set('title', request.params.title);
 
       /** @todo Document what's happening here */
       Stations.fetch({ filter })
@@ -112,17 +112,17 @@ module.exports = [
 
   {
     method: 'GET',
-    path: '/stations/{id}/stream',
+    path: '/stations/{title}/stream',
     config: {
       cors: true,
       validate: {
         params: {
-          id: Joi.string().guid()
+          title: Joi.string()
         }
       }
     },
     handler: (request, reply) => {
-      const filter = new Map().set('id', request.params.id);
+      const filter = new Map().set('title', request.params.title);
 
       /** @todo Document what's happening here */
       Stations.fetch({ filter })
