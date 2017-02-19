@@ -9,7 +9,6 @@
 const Joi = require('joi');
 
 const station = Joi.object().keys({
-  abbreviation: Joi.string(),
   band: Joi.string(),
   call: Joi.string(),
   format: Joi.string(),
