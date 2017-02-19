@@ -919,6 +919,23 @@
         }
       }
     },
+    "hapi-qs": {
+      "version": "1.1.2",
+      "from": "hapi-qs@>=1.1.2 <2.0.0",
+      "resolved": "https://registry.npmjs.org/hapi-qs/-/hapi-qs-1.1.2.tgz",
+      "dependencies": {
+        "hoek": {
+          "version": "3.0.4",
+          "from": "hoek@>=3.0.0 <4.0.0",
+          "resolved": "https://registry.npmjs.org/hoek/-/hoek-3.0.4.tgz"
+        },
+        "joi": {
+          "version": "7.3.0",
+          "from": "joi@>=7.0.1 <8.0.0",
+          "resolved": "https://registry.npmjs.org/joi/-/joi-7.3.0.tgz"
+        }
+      }
+    },
     "har-validator": {
       "version": "2.0.6",
       "from": "har-validator@>=2.0.6 <2.1.0",
