@@ -32,12 +32,12 @@ function addFields(database, connection) {
 
 function up(database, connection) {
   return removeFields(database, connection)
-    .catch(err => { throw new Error(err); });
+    .catch(console.log);
 }
 
 function down(database, connection) {
   return addFields(database, connection)
-    .catch(err => { throw new Error(err); });
+    .catch(console.log);
 }
 
 module.exports.up   = up;

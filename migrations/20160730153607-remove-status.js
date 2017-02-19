@@ -2,8 +2,8 @@
 
 'use strict';
 
-function removeFields(database, connection) {
-  console.log('Removing fields `status` from `stations` table...');
+function removeStatus(database, connection) {
+  console.log('Removing field `status` from `stations` table...');
 
   return new Promise((resolve, reject) => {
     database.db('radio_api')
@@ -16,8 +16,8 @@ function removeFields(database, connection) {
   });
 }
 
-function addFields(database, connection) {
-  console.log('Adding fields `status` to `stations` table...');
+function addStatus(database, connection) {
+  console.log('Adding field `status` to `stations` table...');
 
   return new Promise((resolve, reject) => {
     database.db('radio_api')
@@ -31,13 +31,13 @@ function addFields(database, connection) {
 }
 
 function up(database, connection) {
-  return removeFields(database, connection)
-    .catch(err => { throw new Error(err); });
+  return removeStatus(database, connection)
+    .catch(console.log);
 }
 
 function down(database, connection) {
-  return addFields(database, connection)
-    .catch(err => { throw new Error(err); });
+  return addStatus(database, connection)
+    .catch(console.log);
 }
 
 module.exports.up   = up;
