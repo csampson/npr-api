@@ -96,12 +96,12 @@ function up(database, connection) {
     .then(results => createStationsTable(database, connection))
     .then(results => importStations(database, connection))
     .then(results => indexGeolocations(database, connection))
-    .catch(err => { throw new Error(err); });
+    .catch(console.log);
 }
 
 function down(database, connection) {
   return deleteDatabase(database, connection)
-    .catch(err => { throw new Error(err); });
+    .catch(console.log);
 }
 
 module.exports.up   = up;
