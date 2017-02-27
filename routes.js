@@ -30,7 +30,7 @@ module.exports = [
         query: {
           filter: schemas.station,
           sort: Joi.string(),
-          page: Joi.string()
+          page: Joi.number()
         }
       }
     },
@@ -72,7 +72,7 @@ module.exports = [
           }
 
           if (Object.keys(links).length) {
-            response.header('Links', formatLinkHeader(links));
+            response.header('Link', formatLinkHeader(links));
           }
         })
         .catch(err => {
