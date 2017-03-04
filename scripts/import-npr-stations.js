@@ -30,6 +30,18 @@ const STATES = new Set([
   'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
   'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']);
 
+function wait(args) {
+  // wait one second, to avoid being throtted
+  console.log('[waiting]');
+
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      console.log('[resuming]');
+      resolve(args);
+    }, 1000);
+  });
+}
+
 function raise(err) {
   throw new Error(err);
 }
@@ -115,7 +127,9 @@ function saveStations(stations, state) {
   prev.then(() => (
     fetchStations(curr)
     .then(deserializeStations)
+    .then(wait)
     .then(fetchGeolocations)
+    .then(wait)
     .then(stations => saveStations(stations, curr))
   )).catch(raise)
 ), Promise.resolve());
