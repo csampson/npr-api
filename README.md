@@ -16,7 +16,7 @@ A REST api for querying information about [NPR](http://npr.org) member stations.
 ## Installing
 
 Run `npm install` to grab the project dependencies.   
-Run `npm run db:migrate` to execute database migrations (this will handle populating your database with station records).
+Run `npm run db:create` to create and populate a `radio_api` database
 
 ## Running
 

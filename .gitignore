@@ -9,6 +9,7 @@ node_modules
 .vscode
 
 # Ops
+db.log
 newrelic_agent.log
 
 # Testing
