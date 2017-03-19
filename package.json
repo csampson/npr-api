@@ -8,9 +8,8 @@
   "engine-strict": true,
   "scripts": {
     "start": "node ./app",
-    "test": "npm run test:unit && npm run test:code-coverage",
+    "test": "istanbul cover _mocha -- -R spec ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
     "test:unit": "mocha ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
-    "test:code-coverage": "istanbul cover _mocha -- -R spec ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
     "import-data": "node ./scripts/import-npr-stations",
     "db:migrate": "rethink-migrate"
   },
