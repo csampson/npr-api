@@ -5,14 +5,16 @@
  * @module    import-npr-stations
  * @requires  axios
  * @requires  fs
+ * @requires  lodash/snakeCase
  * @requires  path
  */
 
 'use strict';
 
-const axios = require('axios');
-const fs    = require('fs');
-const path  = require('path');
+const axios     = require('axios');
+const fs        = require('fs');
+const path      = require('path');
+const snakeCase = require('lodash').snakeCase;
 
 const NPR_API_KEY    = process.env.NPR_API_KEY;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
@@ -31,14 +33,14 @@ const STATES = new Set([
   'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']);
 
 function wait(args) {
-  // wait one second, to avoid being throtted
+  // wait a few  seconds, to avoid being throtted
   console.log('[waiting]');
 
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       console.log('[resuming]');
       resolve(args);
-    }, 1000);
+    }, 3000);
   });
 }
 
@@ -60,26 +62,28 @@ function deserializeStations(stations) {
     console.log(`Deserializing ${station.title}`);
 
     return {
-      name: station.name,
-      title: station.title,
       abbreviation: station.abbreviation,
-      call: station.call,
-      frequency: +station.frequency,
-      band: station.band,
-      tagline: station.tagline,
       address: station.address,
+      area_code: station.area_code,
+      band: station.band,
+      call: station.call,
+      fax: station.fax,
+      format: station.format,
+      frequency: +station.frequency,
+      logo: station.logo,
       market_city: station.market_city,
       market_state: station.market_state,
-      format: station.format,
-      status: station.status_name,
-      area_code: station.area_code,
-      phone: station.phone,
+      name: station.name,
       phone_extension: station.phone_extension,
-      fax: station.fax,
-      urls: station.urls,
-      homepage: station.homepage,
-      donation_url: station.donation_url,
-      logo: station.logo
+      phone: station.phone,
+      status: station.status_name,
+      tagline: station.tagline,
+      title: station.title,
+      urls: station.urls.map(url => ({
+        description: url.title,
+        type: snakeCase(url.type_name),
+        href: url.href
+      }))
     };
   });
 }
