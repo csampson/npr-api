@@ -8,8 +8,9 @@
   "engine-strict": true,
   "scripts": {
     "start": "node ./app",
-    "test": "mocha ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
-    "test:ci": "istanbul cover _mocha --report lcovonly -- -R spec ./test/spec-helper.js ./{lib,models}/**/*.spec.js && cat ./coverage/lcov.info | coveralls",
+    "test": "npm run test:unit && npm run test:code-coverage",
+    "test:unit": "mocha ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
+    "test:code-coverage": "istanbul cover _mocha -- -R spec ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
     "import-data": "node ./scripts/import-npr-stations",
     "db:migrate": "rethink-migrate"
   },
@@ -30,7 +31,6 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
-    "coveralls": "^2.11.16",
     "eslint": "^3.15.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-import": "^2.2.0",
