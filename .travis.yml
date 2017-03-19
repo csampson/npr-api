@@ -2,4 +2,8 @@ language: node_js
 node_js:
   - "6.1"
 script:
-    - npm run test:ci
+  - npm test
+after_success:
+  - npm install -g codeclimate-test-reporter
+  - codeclimate-test-reporter < lcov.info
+
