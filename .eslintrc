@@ -17,5 +17,8 @@
     "no-unused-vars": [1, { "vars": "local", "args": "none" }],
     "quotes": [2, "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
     "strict": [0, "global"]
+  },
+  "settings": {
+    "import/resolver": "node"
   }
 }
