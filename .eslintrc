@@ -7,6 +7,7 @@
     "arrow-parens": "off",
     "comma-dangle": ["error", "only-multiline"],
     "default-case": 0,
+    "import/no-extraneous-dependencies": [2, { "devDependencies": true }],
     "import/no-unresolved": [2, { "commonjs": true }],
     "max-len": [1, 175, 2, { "ignoreComments": true }],
     "no-cond-assign": [2, "except-parens"],
