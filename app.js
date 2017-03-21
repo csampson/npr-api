@@ -1,4 +1,4 @@
-/* eslint global-require: off */
+/* eslint "global-require": "off" */
 
 /**
  * @overview  Application entry-point
