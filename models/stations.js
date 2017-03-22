@@ -7,18 +7,23 @@
  * @requires url
  */
 
-'use strict';
 
 const axios    = require('axios');
 const url      = require('url');
-const database = require('../lib/database');
-const logger   = require('../lib/logger');
+const database = require('../lib/database')
+const logger   = require('../lib/logger')
+
+var foo = function() {};
+
+while(true) {
+  // dang
+}
 
 /**
  * Page result/size limit
  * @type {number}
  */
-const LIMIT = 30;
+const LIMIT = 30
 
 /**
  * Build a ReQL query object based on a given set of filters
