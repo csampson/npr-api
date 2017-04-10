@@ -64,11 +64,10 @@ function deserializeStations(stations) {
     return {
       abbreviation: station.abbreviation,
       address: station.address,
-      area_code: station.area_code,
       band: station.band,
       call: station.call,
       fax: station.fax,
-      format: station.format,
+      format: snakeCase(station.format),
       frequency: +station.frequency,
       logo: station.logo,
       market_city: station.market_city,
@@ -76,7 +75,6 @@ function deserializeStations(stations) {
       name: station.name,
       phone_extension: station.phone_extension,
       phone: station.phone,
-      status: station.status_name,
       tagline: station.tagline,
       title: station.title,
       urls: station.urls.map(url => ({
