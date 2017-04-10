@@ -5,7 +5,7 @@
 [![Code Climate](https://codeclimate.com/github/openpublicradio/api/badges/gpa.svg)](https://codeclimate.com/github/openpublicradio/api)
 [![Test Coverage](https://codeclimate.com/github/openpublicradio/api/badges/coverage.svg)](https://codeclimate.com/github/openpublicradio/api/coverage)
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/a66c9fc83d5c8395bd22#?env%5Bproduction%5D=W3sidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJwYmlfZW5kcG9pbnQiLCJ2YWx1ZSI6Imh0dHA6Ly9wdWJsaWMtcmFkaW8tYXBpLmhlcm9rdWFwcC5jb20ifV0=)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/bcbe60cee5a787554e39)
 
 A REST api for querying information about [NPR](http://npr.org) member stations. It features filtering, geolocation searching, pagination, and sorting.
 
