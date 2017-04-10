@@ -48,6 +48,10 @@ function raise(err) {
   throw new Error(err);
 }
 
+function toNumber(number) {
+  return number ? +number : null;
+}
+
 function fetchStations(state) {
   console.log(`Fetching stations for ${state}`);
 
@@ -66,20 +70,20 @@ function deserializeStations(stations) {
       address: station.address,
       band: station.band,
       call: station.call,
-      fax: station.fax,
+      fax: toNumber(station.fax),
       format: snakeCase(station.format),
-      frequency: +station.frequency,
+      frequency: toNumber(station.frequency),
       logo: station.logo,
       market_city: station.market_city,
       market_state: station.market_state,
       name: station.name,
-      phone_extension: station.phone_extension,
-      phone: station.phone,
+      phone_extension: toNumber(station.phone_extension),
+      phone: toNumber(station.phone),
       tagline: station.tagline,
       title: station.title,
       urls: station.urls.map(url => ({
         description: url.title,
-        type: snakeCase(url.type_name),
+        type: snakeCase(url.type_name).replace('mp_3', 'mp3'),
         href: url.href
       }))
     };
