@@ -1,11 +1,11 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Open Broadcasting API",
+        "title": "Open Public Radio API",
         "description": "This a REST api for querying information about [NPR](http://npr.org) member stations. It features filtering, geolocation searching, pagination, and sorting.",
         "version": "1.0.0"
     },
-    "host": "api.openbroadcasting.io",
+    "host": "api.openpublicradio.org",
     "schemes": [
         "http"
     ],
@@ -17,7 +17,7 @@
         "/stations": {
             "get": {
                 "summary": "Fetch a collection of NPR member station records",
-                "description": "When needed, pagination information will be encoded for you in the [Links header](https://www.w3.org/wiki/LinkHeader)\nin the response, e.g:\n```\n<http://api.openbroadcasting.io/stations?page=3>; rel=\"next\", <http://api.openbroadcasting.io/stations?page=29>; rel=\"last\", <http://api.openbroadcasting.io/stations?page=1>; rel=\"prev\"\n```\n",
+                "description": "When needed, pagination information will be encoded for you in the [Links header](https://www.w3.org/wiki/LinkHeader)\nin the response, e.g:\n```\n<http://api.openpublicradio.org/stations?page=3>; rel=\"next\", <http://api.openpublicradio.org/stations?page=29>; rel=\"last\", <http://api.openpublicradio.org/stations?page=1>; rel=\"prev\"\n```\n",
                 "parameters": [
                     {
                         "name": "filter",
