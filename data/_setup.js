@@ -19,8 +19,8 @@ function importStation(station) {
 
 const files   = fs.readdirSync(`${__dirname}`).filter(file => file !== '_setup.js');
 const imports = files.map(importStation);
-const stationsDatabase = Database.interface.db('radio_api');
-const stationsTable    = Database.interface.db('radio_api').table('stations');
+const stationsDatabase = Database.interface.db('open_public_radio');
+const stationsTable    = Database.interface.db('open_public_radio').table('stations');
 
 let stations = imports.reduce((prev, current) => prev.concat(current), []);
 let databaseConnection;
@@ -36,13 +36,13 @@ stations = stations.map(station => {
   return station;
 });
 
-// Create and setup the `radio_api` database
+// Create and setup the `open_public_radio` database
 Database.connect()
   .then(connection => {
     databaseConnection = connection;
 
     return Database.interface
-      .dbCreate('radio_api')
+      .dbCreate('open_public_radio')
       .run(databaseConnection);
   })
   .then(() => (
@@ -66,10 +66,10 @@ Database.connect()
       .run(databaseConnection)
   ))
   .then(() => {
-    console.log('Database `radio_api` setup complete.');
+    console.log('Database `open_public_radio` setup complete.');
     process.exit(0);
   })
   .catch(err => {
-    console.log(`Database \`radio_api\` setup failed:\n${err}`);
+    console.log(`Database \`open_public_radio\` setup failed:\n${err}`);
     process.exit(1);
   });
