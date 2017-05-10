@@ -132,19 +132,32 @@ class Stations {
    * @returns {Promise} Fetch operation
    */
   static fetchStream(station) {
-    if (!station.stream_url) {
-      const error = new Error('Missing `station.stream_url` for `Stations::fetchStream`');
+    if (!station) {
+      const error = new Error('Missing `station` for `Stations::fetchStream`');
       return Promise.reject(error);
     }
 
+    const streamURL = station.urls.streams.find(stationURL => stationURL.rel === 'primary_format_stream');
+
+    if (!streamURL) {
+      const error = new Error('No stream URL found for `Stations::fetchStream`');
+      return Promise.reject(error);
+    }
+
+    /** @todo canonical stream resource obj. */
+    if (!/.pls$|.m3u$/.test(streamURL)) {
+      return Promise.resolve(streamURL.href);
+    }
+
     // Grab the first url in the playlist response
-    return axios.get(station.stream_url).then(response => {
+    return axios.get(streamURL.href).then(response => {
       const content = response.data.split('\n');
 
       /** @todo Move this to a function */
+      /** @todo Should this return with `url.path`? */
       return content.find(line => {
-        const streamURL = url.parse(line);
-        return streamURL.protocol && streamURL.hostname;
+        const parsedURL = url.parse(line);
+        return parsedURL.protocol && parsedURL.hostname;
       });
     });
   }

@@ -130,7 +130,7 @@ module.exports = [
           if (results.stations.length) {
             const [station] = results.stations;
 
-            if (station && station.stream_url) {
+            if (station) {
               Stations.fetchStream(station).then(reply).catch(Boom.wrap);
             } else {
               reply(Boom.notFound('Station stream url not found'));

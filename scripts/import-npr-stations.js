@@ -25,6 +25,25 @@ if (!NPR_API_KEY) {
   throw new Error('Missing required envrionment variable: `GOOGLE_API_KEY`');
 }
 
+// Maps NPR link `type_name` values to better organized metadata objects
+const LINK_METADATA = new Map()
+  .set('audio_aac_stream', { category: 'streams', rel: 'secondary_format_stream' })
+  .set('audio_mp3_stream', { category: 'streams', rel: 'secondary_format_stream' })
+  .set('audio_real_media_stream', { category: 'streams', rel: 'secondary_format_stream' })
+  .set('audio_stream_landing_page', { category: 'brand', rel: 'listen_page' })
+  .set('audio_windows_media_stream', { category: 'streams', rel: 'secondary_format_stream' })
+  .set('facebook_url', { category: 'brand', rel: 'facebook_page' })
+  .set('local_news', { category: 'brand', rel: 'local_news' })
+  .set('newscast', { category: 'brand', rel: 'newscast' })
+  .set('online_store', { category: 'brand', rel: 'online_store' })
+  .set('organization_home_page', { category: 'brand', rel: 'home_page' })
+  .set('pledge_page', { category: 'donate', rel: 'pledge_page' })
+  .set('podcast', { category: 'podcasts', rel: 'podcast' })
+  .set('program_schedule', { category: 'programming', rel: 'program_schedule' })
+  .set('rss_feed', { category: 'programming', rel: 'rss_feed' })
+  .set('station_id_mp3_audio', { category: 'brand', rel: 'station_id' })
+  .set('twitter_feed', { category: 'brand', rel: 'twitter_feed' });
+
 const STATES = new Set([
   'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District Of Columbia', 'Florida',
   'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts',
@@ -48,8 +67,45 @@ function raise(err) {
   throw new Error(err);
 }
 
-function toNumber(number) {
-  return number ? +number : null;
+// NPR API uses `primary_stream` 0 or 1 instead of booleans
+function toBoolean(value) {
+  return value === 1;
+}
+
+function toNumber(value) {
+  return value ? Number(value) : null;
+}
+
+function getUrls(station) {
+  const urls = {
+    brand: [],
+    donate: [],
+    podcasts: [],
+    programming: [],
+    streams: []
+  };
+
+  station.urls.forEach((url, index) => {
+    const type = snakeCase(url.type_name).replace('mp_3', 'mp3');
+    const metadata = LINK_METADATA.get(type);
+
+    if (!LINK_METADATA.has(type)) {
+      throw new Error(`Unknown station link type encountered: "${url.type_name}"`);
+    }
+
+    urls[metadata.category].push({
+      href: url.href,
+      rel: toBoolean(url.primary_stream) ? 'primary_format_stream' : metadata.rel,
+      title: url.title
+    });
+  });
+
+  // For stations with no known primary format stream, designate the first stream as primary
+  if (urls.streams.length && !urls.streams.some(s => s.rel === 'primary_format_stream')) {
+    urls.streams[0].rel = 'primary_format_stream';
+  }
+
+  return urls;
 }
 
 function fetchStations(state) {
@@ -77,15 +133,11 @@ function deserializeStations(stations) {
       market_city: station.market_city,
       market_state: station.market_state,
       name: station.name,
-      phone_extension: toNumber(station.phone_extension),
       phone: toNumber(station.phone),
+      phone_extension: toNumber(station.phone_extension),
       tagline: station.tagline,
       title: station.title,
-      urls: station.urls.map(url => ({
-        description: url.title,
-        type: snakeCase(url.type_name).replace('mp_3', 'mp3'),
-        href: url.href
-      }))
+      urls: getUrls(station)
     };
   });
 }
