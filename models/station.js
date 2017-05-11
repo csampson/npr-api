@@ -30,7 +30,8 @@ class Station {
   static fetch(title) {
     const query = database.interface
       .table('stations')
-      .get(title);
+      .get(title)
+      .without({ geolocation: '$reql_type$' });
 
     return database.connect()
       .then(connection => (
@@ -86,8 +87,9 @@ class Station {
           .run(connection)
           .then(count => (
             query.slice(first, last)
+              .without({ geolocation: '$reql_type$' })
               .run(connection)
-              .then(unmarshal)
+              .then(stations => stations.toArray())
               .then(stations => ({
                 currentPage: options.page || 1,
                 pageCount: count > LIMIT ? Math.ceil(count / LIMIT) : 1,

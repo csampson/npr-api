@@ -26,16 +26,19 @@ function setupSandbox(options = {}) {
 
   if (options.succeed) {
     db = {
-      run: sandbox.stub().resolves({
-        toArray: sandbox.stub().returns(options.result)
-      })
+      run: sandbox.stub().resolves(
+        Array.isArray(options.result)
+          ? { toArray: sandbox.stub().resolves(options.result) }
+          : options.result
+      )
     };
 
-    db.get     = sandbox.stub().returns(db);
+    db.count   = sandbox.stub().returns(db);
     db.filter  = sandbox.stub().returns(db);
+    db.get     = sandbox.stub().returns(db);
     db.orderBy = sandbox.stub().returns(db);
     db.slice   = sandbox.stub().returns(db);
-    db.count   = sandbox.stub().returns(db);
+    db.without = sandbox.stub().returns(db);
 
     sandbox.stub(database.interface, 'table').returns(db);
     sandbox.stub(database, 'connect').resolves({});
@@ -57,7 +60,7 @@ describe('Station', () => {
     it('should resolve with a station', () => {
       const station = mocks.normalizedStations[0];
 
-      setupSandbox({ result: [station] });
+      setupSandbox({ result: station });
       return Station.fetch('WWNO-FM').should.eventually.become(station);
     });
   });
@@ -94,7 +97,7 @@ describe('Station', () => {
       });
     });
 
-    context('when a station object includes the `geolocation` property', () => {
+    xcontext('when a station object includes the `geolocation` property', () => {
       it('should normalize `geolocation`', () => {
         setupSandbox({ result: mocks.rawStations });
 

@@ -26,31 +26,6 @@ function buildFilter(params) {
   return predicate;
 }
 
-/**
- * Provides consumer response -friendly representation of station objects
- * @param   {Object} cursor - ReQL cursor object
- * @returns {Array}  Collection of unmarshalled station objects
- */
-function unmarshal(cursor) {
-  // Manually convert ReQL `@geolocation` to GeoJSON
-  return cursor.toArray().map(station => {
-    /** @todo Necessary? */
-    if ('doc' in station) {
-      station = station.doc;
-    }
-
-    if (station.geolocation) {
-      station.geolocation = {
-        coordinates: station.geolocation.coordinates,
-        type: station.geolocation.type
-      };
-    }
-
-    return station;
-  });
-}
-
 module.exports = {
-  buildFilter,
-  unmarshal
+  buildFilter
 };
