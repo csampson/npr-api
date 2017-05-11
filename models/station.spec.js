@@ -31,6 +31,7 @@ function setupSandbox(options = {}) {
       })
     };
 
+    db.get     = sandbox.stub().returns(db);
     db.filter  = sandbox.stub().returns(db);
     db.orderBy = sandbox.stub().returns(db);
     db.slice   = sandbox.stub().returns(db);

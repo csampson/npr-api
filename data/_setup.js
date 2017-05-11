@@ -50,6 +50,17 @@ Database.connect()
       .tableCreate('stations', { primaryKey: 'title' })
       .run(databaseConnection)
   ))
+  .then(() => {
+    const secondaryIndexes = [
+      'band', 'call', 'format', 'frequency', 'market_city', 'market_state', 'name', 'tagline'
+    ];
+
+    return secondaryIndexes.map(index => (
+      stationsTable
+        .indexCreate(index)
+        .run(databaseConnection)
+    ));
+  })
   .then(() => (
     stationsTable
       .insert(stations)

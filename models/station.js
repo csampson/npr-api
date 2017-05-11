@@ -30,14 +30,12 @@ class Station {
   static fetch(title) {
     const query = database.interface
       .table('stations')
-      .filter({ title });
+      .get(title);
 
     return database.connect()
       .then(connection => (
         query.run(connection)
       ))
-      .then(unmarshal)
-      .then(stations => stations[0])
       .catch(err => {
         const error = new Error(`Failed to execute \`Station::fetch\`: ${err}`);
 
