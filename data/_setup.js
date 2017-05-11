@@ -47,17 +47,12 @@ Database.connect()
   })
   .then(() => (
     stationsDatabase
-      .tableCreate('stations')
+      .tableCreate('stations', { primaryKey: 'title' })
       .run(databaseConnection)
   ))
   .then(() => (
     stationsTable
       .insert(stations)
-      .run(databaseConnection)
-  ))
-  .then(() => (
-    stationsTable
-      .indexCreate('title')
       .run(databaseConnection)
   ))
   .then(() => (
