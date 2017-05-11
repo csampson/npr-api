@@ -1,10 +1,11 @@
 /**
  * @overview Stations table interface
- * @module   stations
+ * @module   station
  * @requires axios
  * @requires database
  * @requires logger
  * @requires url
+ * @requires utils
  */
 
 'use strict';
@@ -14,6 +15,8 @@ const url      = require('url');
 const database = require('../lib/database');
 const logger   = require('../lib/logger');
 
+const { buildFilter, unmarshal } = require('./utils');
+
 /**
  * Page result/size limit
  * @type {number}
@@ -21,60 +24,37 @@ const logger   = require('../lib/logger');
 const LIMIT = 30;
 
 /**
- * Build a ReQL query object based on a given set of filters
- * @param   {Object} params - Set of filter parameters
- * @returns {Object} ReQL query object
- */
-function buildFilter(params) {
-  let predicate;
-
-  params.forEach((value, param) => {
-    if (param !== 'geolocation') {
-      predicate = predicate
-        ? predicate.and(database.interface.row(param).match(`(?i)${value}`))
-        : database.interface.row(param).match(`(?i)${value}`);
-    }
-  });
-
-  return predicate;
-}
-
-/**
- * Provides consumer response -friendly representation of station objects
- * @param   {Object} cursor - ReQL cursor object
- * @returns {Array}  Collection of unmarshalled station objects
- */
-function unmarshal(cursor) {
-  // Manually convert ReQL `@geolocation` to GeoJSON
-  return cursor.toArray().map(station => {
-    if ('doc' in station) {
-      station = station.doc;
-    }
-
-    if (station.geolocation) {
-      station.geolocation = {
-        coordinates: station.geolocation.coordinates,
-        type: station.geolocation.type
-      };
-    }
-
-    return station;
-  });
-}
-
-/**
  * @class
  */
-class Stations {
+class Station {
+  static fetch(title) {
+    const query = database.interface
+      .table('stations')
+      .filter({ title });
+
+    return database.connect()
+      .then(connection => (
+        query.run(connection)
+      ))
+      .then(unmarshal)
+      .then(stations => stations[0])
+      .catch(err => {
+        const error = new Error(`Failed to execute \`Station::fetch\`: ${err}`);
+
+        logger.error(err);
+        return Promise.reject(error);
+      });
+  }
+
   /**
-   * Fetches a set of all radio stations
+   * Gets a list of all radio stations
    * @param   {Object} options        - Hashmap of fetch options
    * @param   {number} options.page   - Page number of stations to fetch
    * @param   {string} options.sort   - Station attribute to sort by
    * @param   {Map}    options.filter - Filtering options
-   * @returns {Promise} Fetch operation
+   * @returns {Promise} List operation
    */
-  static fetch(options = { page: 1 }) {
+  static list(options = { page: 1 }) {
     return database.connect()
       .then(connection => {
         let query = database.interface.table('stations');
@@ -118,7 +98,7 @@ class Stations {
           ));
       })
       .catch(err => {
-        const error = new Error('Failed to execute `Stations::fetch`');
+        const error = new Error(`Failed to execute \`Station::list\`: ${err}`);
 
         logger.error(err);
         return Promise.reject(error);
@@ -133,14 +113,14 @@ class Stations {
    */
   static fetchStream(station) {
     if (!station) {
-      const error = new Error('Missing `station` for `Stations::fetchStream`');
+      const error = new Error('Missing `station` for `Station::fetchStream`');
       return Promise.reject(error);
     }
 
     const streamURL = station.urls.streams.find(stationURL => stationURL.rel === 'primary_format_stream');
 
     if (!streamURL) {
-      const error = new Error('No stream URL found for `Stations::fetchStream`');
+      const error = new Error('No stream URL found for `Station::fetchStream`');
       return Promise.reject(error);
     }
 
@@ -163,4 +143,4 @@ class Stations {
   }
 }
 
-module.exports = Stations;
+module.exports = Station;

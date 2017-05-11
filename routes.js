@@ -13,13 +13,14 @@ const Boom             = require('boom');
 const formatLinkHeader = require('format-link-header');
 const Joi              = require('joi');
 const toPairs          = require('lodash/toPairs');
-const Stations         = require('./models/stations');
-const stationsSchema   = require('./schemas/station');
+const Station          = require('./models/station');
+const stationSchema    = require('./schemas/station');
 
 const schemas = {
-  station: stationsSchema
+  station: stationSchema
 };
 
+/** @todo  Strip `Error#message` from error responses */
 module.exports = [
   {
     method: 'GET',
@@ -43,7 +44,7 @@ module.exports = [
       };
 
       /** @todo Document what's happening here */
-      Stations.fetch(options)
+      Station.list(options)
         .then(results => {
           const links     = {};
           const prevPage  = (results.currentPage - 1) || null;
@@ -93,13 +94,11 @@ module.exports = [
       }
     },
     handler: (request, reply) => {
-      const filter = new Map().set('title', request.params.title);
-
       /** @todo Document what's happening here */
-      Stations.fetch({ filter })
-        .then(results => {
-          if (results.stations.length) {
-            reply(results.stations);
+      Station.fetch(request.params.title)
+        .then(result => {
+          if (result) {
+            reply(result);
           } else {
             reply(Boom.notFound('Station record not found'));
           }
@@ -122,19 +121,15 @@ module.exports = [
       }
     },
     handler: (request, reply) => {
-      const filter = new Map().set('title', request.params.title);
-
       /** @todo Document what's happening here */
-      Stations.fetch({ filter })
-        .then(results => {
-          if (results.stations.length) {
-            const [station] = results.stations;
+      Station.fetch(request.params.title)
+        .then(result => {
+          if (result) {
+            const station = result;
 
-            if (station) {
-              Stations.fetchStream(station).then(reply).catch(Boom.wrap);
-            } else {
-              reply(Boom.notFound('Station stream url not found'));
-            }
+            Station.fetchStream(station)
+              .then(uri => reply(uri).type('text/plain'))
+              .catch(Boom.notFound('Station stream url not found'));
           } else {
             reply(Boom.notFound('Station record not found'));
           }

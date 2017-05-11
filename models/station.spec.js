@@ -4,7 +4,7 @@
 
 const sinon    = require('sinon');
 const database = require('../lib/database');
-const Stations = require('./stations');
+const Station  = require('./station');
 
 const sandbox = sinon.sandbox.create();
 const mocks   = {
@@ -20,14 +20,14 @@ let db;
 
 function setupSandbox(options = {}) {
   options = Object.assign({
-    stations: mocks.normalizedStations,
+    result: mocks.normalizedStations,
     succeed: true
   }, options);
 
   if (options.succeed) {
     db = {
       run: sandbox.stub().resolves({
-        toArray: sandbox.stub().returns(options.stations)
+        toArray: sandbox.stub().returns(options.result)
       })
     };
 
@@ -43,7 +43,7 @@ function setupSandbox(options = {}) {
   }
 }
 
-describe('Stations', () => {
+describe('Station', () => {
   beforeEach(() => {
     db = {};
   });
@@ -53,9 +53,19 @@ describe('Stations', () => {
   });
 
   describe('::fetch', () => {
+    it('should resolve with a station', () => {
+      const station = mocks.normalizedStations[0];
+
+      setupSandbox({ result: [station] });
+      return Station.fetch('WWNO-FM').should.eventually.become(station);
+    });
+  });
+
+  describe('::list', () => {
     it('should resolve with an [Array] of stations', () => {
       setupSandbox();
-      return Stations.fetch().should.eventually.become({
+
+      return Station.list().should.eventually.become({
         pageCount: 1,
         currentPage: 1,
         stations: mocks.normalizedStations
@@ -65,7 +75,8 @@ describe('Stations', () => {
     context('when the `sort` param is specified', () => {
       it('should sort by the given property', () => {
         setupSandbox();
-        return Stations.fetch({ sort: '<value>' }).then(res => (
+
+        return Station.list({ sort: '<value>' }).then(res => (
           db.orderBy.should.have.been.calledWith('<value>')
         ));
       });
@@ -76,7 +87,7 @@ describe('Stations', () => {
         const filter = new Map().set('<property>', '<value>');
         setupSandbox();
 
-        return Stations.fetch({ filter }).then(res => (
+        return Station.list({ filter }).then(res => (
           db.filter.should.have.been.called
         ));
       });
@@ -84,8 +95,9 @@ describe('Stations', () => {
 
     context('when a station object includes the `geolocation` property', () => {
       it('should normalize `geolocation`', () => {
-        setupSandbox({ stations: mocks.rawStations });
-        return Stations.fetch().should.eventually.become({
+        setupSandbox({ result: mocks.rawStations });
+
+        return Station.list().should.eventually.become({
           pageCount: 1,
           currentPage: 1,
           stations: mocks.normalizedStations
@@ -96,7 +108,7 @@ describe('Stations', () => {
     context('when the database connection fails', () => {
       it('should reject with an [Error]', () => {
         setupSandbox({ succeed: false });
-        return Stations.fetch().should.eventually.be.rejectedWith(Error);
+        return Station.list().should.eventually.be.rejectedWith(Error);
       });
     });
   });
