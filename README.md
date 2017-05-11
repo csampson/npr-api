@@ -1,4 +1,4 @@
-# Open Public Radio API
+# The Open Public Radio API
 
 [![Build Status](https://travis-ci.org/openpublicradio/api.svg?branch=master)](https://travis-ci.org/openpublicradio/api)
 [![bitHound Overall Score](https://www.bithound.io/github/openpublicradio/api/badges/score.svg)](https://www.bithound.io/github/openpublicradio/api)
