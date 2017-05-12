@@ -15,7 +15,7 @@ const url      = require('url');
 const database = require('../lib/database');
 const logger   = require('../lib/logger');
 
-const { buildFilter, unmarshal } = require('./utils');
+const { buildFilter } = require('./utils');
 
 /**
  * Page result/size limit
@@ -29,7 +29,7 @@ const LIMIT = 30;
 class Station {
   static fetch(title) {
     const query = database.interface
-      .table('stations')
+      .table('stations', { readMode: 'outdated' })
       .get(title)
       .without({ geolocation: '$reql_type$' });
 
@@ -56,7 +56,7 @@ class Station {
   static list(options = { page: 1 }) {
     return database.connect()
       .then(connection => {
-        let query = database.interface.table('stations');
+        let query = database.interface.table('stations', { readMode: 'outdated' });
         let first;
         let last;
 
