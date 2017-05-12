@@ -21,7 +21,7 @@ const { buildFilter } = require('./utils');
  * Page result/size limit
  * @type {number}
  */
-const LIMIT = 30;
+const LIMIT = 20;
 
 /**
  * @class
