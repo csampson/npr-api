@@ -13,3 +13,9 @@ chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
 
 sinon.stub(logger, 'error');
+
+global.sandbox = sinon.sandbox.create();
+
+afterEach(() => {
+  global.sandbox.restore();
+});

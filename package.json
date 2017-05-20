@@ -2,8 +2,8 @@
   "private": true,
   "version": "1.0.0",
   "engines": {
-    "node": "~6.0.0",
-    "npm": "~3.8.8"
+    "node": "~8.1.2",
+    "npm": "~5.0.4"
   },
   "engine-strict": true,
   "scripts": {
@@ -24,7 +24,7 @@
     "lodash": "^4.17.4",
     "nconf": "^0.8.4",
     "newrelic": "^1.37.2",
-    "rethinkdb": "^2.3.3"
+    "redis": "^2.7.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",

@@ -2,118 +2,174 @@
 
 'use strict';
 
-const sinon    = require('sinon');
-const database = require('../lib/database');
-const Station  = require('./station');
+const Station = require('./station');
 
-const sandbox = sinon.sandbox.create();
-const mocks   = {
-  normalizedStations: [
-    { title: '<title>',  geolocation: { type: 'Point', coordinates: [90, -90] } }
-  ],
-  rawStations: [
-    { title: '<title>', geolocation: { type: 'Point', coordinates: [90, -90], __raw_field__: null } }
-  ]
-};
+const test = {};
+let station;
+let operation;
 
-let db;
+test.values = new Map()
+  .set('station-stringified', '{ "title": "<title>" }')
+  .set('stations-stringified', ['{ "title": "<title>" }', '{ "title": "<title>" }'])
+  .set('titles', ['station:<title>', 'station:<title>'])
+  .set('error', new Error())
+  .set('#fetch-resolved', { title: '<title>' })
+  .set('#list-resolved', { currentPage: 1, stations: [{ title: '<title>' }, { title: '<title>' }], pageCount: 1 })
+  .set('#list-resolved-with-sorting', { currentPage: 1, stations: [{ title: '<title>' }, { title: '<title>' }], pageCount: 1 })
+  .set('#list-resolved-with-filtering', { currentPage: 1, stations: [{ title: '<title>' }, { title: '<title>' }], pageCount: 1 });
 
-function setupSandbox(options = {}) {
-  options = Object.assign({
-    result: mocks.normalizedStations,
-    succeed: true
-  }, options);
+test.scenarios = new Map()
+  .set('#fetch', () => {
+    const execute = global.sandbox.stub();
+    const database = { execute };
 
-  if (options.succeed) {
-    db = {
-      run: sandbox.stub().resolves(
-        Array.isArray(options.result)
-          ? { toArray: sandbox.stub().resolves(options.result) }
-          : options.result
-      )
-    };
+    execute.withArgs('get').resolves(test.values.get('station-stringified'));
 
-    db.count   = sandbox.stub().returns(db);
-    db.filter  = sandbox.stub().returns(db);
-    db.get     = sandbox.stub().returns(db);
-    db.orderBy = sandbox.stub().returns(db);
-    db.slice   = sandbox.stub().returns(db);
-    db.without = sandbox.stub().returns(db);
+    station = new Station(database);
+    operation = station.fetch('<title>');
 
-    sandbox.stub(database.interface, 'table').returns(db);
-    sandbox.stub(database, 'connect').resolves({});
-  } else {
-    sandbox.stub(database, 'connect').rejects(Error);
-  }
-}
+    return operation;
+  })
+  .set('#fetch-error', () => {
+    const execute = global.sandbox.stub();
+    const database = { execute };
+
+    execute.withArgs('get').rejects(test.values.get('error'));
+
+    station = new Station(database);
+  })
+  .set('#list', () => {
+    const execute = global.sandbox.stub();
+    const database = { execute };
+
+    execute.withArgs('multi').resolves(test.values.get('stations-stringified'));
+    execute.withArgs('zcount').resolves(2);
+    execute.withArgs('zrange').resolves(test.values.get('titles'));
+
+    station = new Station(database);
+    operation = station.list();
+
+    return operation;
+  })
+  .set('#list-with-sortBy', () => {
+    const execute = global.sandbox.stub();
+    const database = { execute };
+
+    execute.withArgs('multi').resolves(test.values.get('stations-stringified'));
+    execute.withArgs('zcount').resolves(1);
+    execute.withArgs('zrange').resolves(test.values.get('titles'));
+
+    station = new Station(database);
+    operation = station.list({ sortBy: 'title' });
+
+    return operation;
+  })
+  .set('#list-with-filter', () => {
+    const execute = global.sandbox.stub();
+    const database = { execute };
+
+    execute.withArgs('exists').resolves(0);
+    execute.withArgs('multi').resolves(test.values.get('stations-stringified'));
+    execute.withArgs('zinterstore').resolves(2);
+    execute.withArgs('zrange').resolves(test.values.get('titles'));
+
+    station = new Station(database);
+    operation = station.list({ filter: new Map().set('band', 'am') });
+
+    return operation;
+  });
 
 describe('Station', () => {
-  beforeEach(() => {
-    db = {};
-  });
+  describe('#fetch', () => {
+    context('when successful', () => {
+      beforeEach(test.scenarios.get('#fetch'));
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+      it('should execute redis `GET` for the station', () => (
+        station.database.execute.should.have.been.calledWithExactly('get', 'station:<title>')
+      ));
 
-  describe('::fetch', () => {
-    it('should resolve with a station', () => {
-      const station = mocks.normalizedStations[0];
+      it('should resolve with a station', () => (
+        operation.should.eventually.become(test.values.get('#fetch-resolved'))
+      ));
+    });
 
-      setupSandbox({ result: station });
-      return Station.fetch('WWNO-FM').should.eventually.become(station);
+    context('when unsuccessful', () => {
+      beforeEach(test.scenarios.get('#fetch-error'));
+
+      it('should reject with an error', () => (
+        station.fetch('<title>').should.be.rejectedWith(Error)
+      ));
     });
   });
 
-  describe('::list', () => {
-    it('should resolve with an [Array] of stations', () => {
-      setupSandbox();
+  describe('#list', () => {
+    context('when given no options', () => {
+      beforeEach(test.scenarios.get('#list'));
 
-      return Station.list().should.eventually.become({
-        pageCount: 1,
-        currentPage: 1,
-        stations: mocks.normalizedStations
-      });
+      it('should execute redis `GET` for each station', () => (
+        station.database.execute.should.have.been.calledWithExactly('multi', [
+          ['get', 'station:<title>'],
+          ['get', 'station:<title>']
+        ])
+      ));
+
+      it('should resolve with results', () => (
+        operation.should.eventually.become(test.values.get('#list-resolved'))
+      ));
     });
 
-    context('when the `sort` param is specified', () => {
-      it('should sort by the given property', () => {
-        setupSandbox();
+    context('when sorting is applied', () => {
+      beforeEach(test.scenarios.get('#list-with-sortBy'));
 
-        return Station.list({ sort: '<value>' }).then(res => (
-          db.orderBy.should.have.been.calledWith('<value>')
-        ));
-      });
+      it('should execute redis `GET` for each station', () => (
+        station.database.execute.should.have.been.calledWithExactly('multi', [
+          ['get', 'station:<title>'],
+          ['get', 'station:<title>']
+        ])
+      ));
+
+      it('should resolve with results', () => (
+        operation.should.eventually.become(test.values.get('#list-resolved-with-sorting'))
+      ));
     });
 
-    context('when the `filter` param is specified', () => {
-      it('should filter by the given property', () => {
-        const filter = new Map().set('<property>', '<value>');
-        setupSandbox();
+    context('when filtering is applied', () => {
+      beforeEach(test.scenarios.get('#list-with-filter'));
 
-        return Station.list({ filter }).then(res => (
-          db.filter.should.have.been.called
-        ));
-      });
+      it('should execute redis `GET` for each station', () => (
+        station.database.execute.should.have.been.calledWithExactly('multi', [
+          ['get', 'station:<title>'],
+          ['get', 'station:<title>']
+        ])
+      ));
+
+      it('should resolve with results', () => (
+        operation.should.eventually.become(test.values.get('#list-resolved-with-filtering'))
+      ));
     });
 
-    xcontext('when a station object includes the `geolocation` property', () => {
-      it('should normalize `geolocation`', () => {
-        setupSandbox({ result: mocks.rawStations });
+    context('when pagination is applied', () => {
 
-        return Station.list().should.eventually.become({
-          pageCount: 1,
-          currentPage: 1,
-          stations: mocks.normalizedStations
-        });
-      });
     });
 
-    context('when the database connection fails', () => {
-      it('should reject with an [Error]', () => {
-        setupSandbox({ succeed: false });
-        return Station.list().should.eventually.be.rejectedWith(Error);
-      });
+    context('when both sorting and filtering are applied', () => {
+
     });
+
+    context('when sorting, filtering, and pagination are applied', () => {
+
+    });
+
+    context('when the result has already been stored', () => {
+
+    });
+
+    context('when unsuccessful', () => {
+
+    });
+  });
+
+  xdescribe('#fetchStream', () => {
+
   });
 });

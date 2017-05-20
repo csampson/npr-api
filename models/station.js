@@ -2,20 +2,16 @@
  * @overview Stations table interface
  * @module   station
  * @requires axios
- * @requires database
+ * @requires lodash/snakeCase
  * @requires logger
- * @requires url
- * @requires utils
  */
 
 'use strict';
 
-const axios    = require('axios');
-const url      = require('url');
-const database = require('../lib/database');
-const logger   = require('../lib/logger');
+const axios = require('axios');
+const snakeCase = require('lodash/snakeCase');
 
-const { buildFilter } = require('./utils');
+const logger = require('../lib/logger');
 
 /**
  * Page result/size limit
@@ -23,123 +19,147 @@ const { buildFilter } = require('./utils');
  */
 const LIMIT = 20;
 
-/**
- * @class
- */
 class Station {
-  static fetch(title) {
-    const query = database.interface
-      .table('stations', { readMode: 'outdated' })
-      .get(title)
-      .without({ geolocation: '$reql_type$' });
+  /**
+   * @param {Database} database A database client instance
+   */
+  constructor(database) {
+    this.database = database;
+  }
 
-    return database.connect()
-      .then(connection => (
-        query.run(connection)
-      ))
-      .catch(err => {
-        const error = new Error(`Failed to execute \`Station::fetch\`: ${err}`);
-
-        logger.error(err);
-        return Promise.reject(error);
+  /**
+   * Retrieve a single station record
+   * @param   {string} title - Station's `title` (e.g. 'WWNO-FM')
+   * @returns {Promise} Fetch operation
+   */
+  fetch(title) {
+    return this.database.execute('get', `station:${title}`)
+      .then(JSON.parse)
+      .catch(error => {
+        logger.error(error);
+        return Promise.reject(new Error(`Failed to fetch station with title: ${title}.`));
       });
   }
 
   /**
    * Gets a list of all radio stations
-   * @param   {Object} options        - Hashmap of fetch options
-   * @param   {number} options.page   - Page number of stations to fetch
-   * @param   {string} options.sort   - Station attribute to sort by
-   * @param   {Map}    options.filter - Filtering options
+   * @param   {Object} options         - Hashmap of fetch options
+   * @param   {Map}    options.filter  - Filtering options
+   * @param   {Object} options.geoNear - Geolocation search options
+   * @param   {number} options.page    - Page number of stations to fetch
+   * @param   {string} options.sortBy  - Station attribute to sort by
    * @returns {Promise} List operation
    */
-  static list(options = { page: 1 }) {
-    return database.connect()
-      .then(connection => {
-        let query = database.interface.table('stations', { readMode: 'outdated' });
-        let first;
-        let last;
+  async list(options = {}) {
+    options = Object.assign({ filter: null, geoNear: null, page: 1, sortBy: 'title' }, options);
 
-        if (options.filter) {
-          const filter = buildFilter(options.filter);
-          query = filter ? query.filter(filter) : query;
-        }
+    const offset = (options.page > 1) ? ((options.page - 1) * LIMIT) : 0;
+    const lookupKeys = [];
+    let resultExists;
+    let resultKey = 'station';
+    let count;
 
-        if (options.filter && options.filter.has('geolocation')) {
-          const [latitude, longitude] = options.filter.get('geolocation');
-          query = query.getNearest(database.interface.point(longitude, latitude), { index: 'geolocation' });
-        }
+    if (options.filter && options.filter.size) {
+      resultKey += `.filter.${
+        [...options.filter.entries()]
+          .sort()
+          .map(([attr, value]) => `${attr}:${snakeCase(value).toLowerCase()}`)
+          .join('.')
+      }`;
+    }
 
-        if (options.sort) {
-          query = query.orderBy(options.sort);
-        }
+    if (options.geoNear) {
+      const [latitude, longitude] = options.geoNear.coordinates;
+      const distance = options.geoNear.distance || 50;
+      resultKey += `.geoNear.coordinates:${longitude},${latitude};distance:${distance}`;
+    }
 
-        if (options.page > 1) {
-          first = (options.page - 1) * LIMIT;
-          last  = first + (LIMIT);
-        } else {
-          first = 0;
-          last  = LIMIT;
-        }
+    if (!options.filter && !options.geoNear) {
+      resultKey = `station.${options.sortBy}`;
+      resultExists = true;
+    } else {
+      resultExists = Boolean(await this.database.execute('exists', resultKey));
+    }
 
-        return query
-          .count()
-          .run(connection)
-          .then(count => (
-            query.slice(first, last)
-              .without({ geolocation: '$reql_type$' })
-              .run(connection)
-              .then(stations => stations.toArray())
-              .then(stations => ({
-                currentPage: options.page || 1,
-                pageCount: count > LIMIT ? Math.ceil(count / LIMIT) : 1,
-                stations
-              }))
-          ));
-      })
-      .catch(err => {
-        const error = new Error(`Failed to execute \`Station::list\`: ${err}`);
+    // Apply geolocation searching
+    /** @todo use `EXPIRE` command */
+    if (options.geoNear && !resultExists) {
+      const [latitude, longitude] = options.geoNear.coordinates;
+      const distance = options.geoNear.distance || 50;
+      const geoSetKey = `station.geoNear.coordinates:${latitude},${longitude};distance:${distance}`;
 
-        logger.error(err);
-        return Promise.reject(error);
+      await this.database.execute('georadius', 'station.geolocation', longitude, latitude, distance, 'mi', 'store', geoSetKey);
+      lookupKeys.push({ name: geoSetKey, weight: 1 });
+    }
+
+    // Apply filtering
+    if (options.filter) {
+      options.filter.forEach((value, attr) => {
+        lookupKeys.push({ name: `station.${attr}:${snakeCase(value).toLowerCase()}`, weight: 1 });
+      });
+    }
+
+    // Apply sorting
+    if (options.sortBy) {
+      lookupKeys.push({ name: `station.${options.sortBy}`, weight: 2 });
+    } else {
+      lookupKeys.push({ name: 'station.title', weight: 2 });
+    }
+
+    // Either count the existing full page of keys or create a page for this filter set
+    /** @todo use `EXPIRE` command */
+    if (resultExists) {
+      count = await this.database.execute('zcount', resultKey, '-inf', '+inf');
+    } else {
+      count = await this.database.execute('zinterstore', resultKey, lookupKeys.length, ...lookupKeys.map(k => k.name), 'weights', ...lookupKeys.map(k => k.weight));
+    }
+
+    // Paginate by obtaining a subset of matching keys, then executing redis `GET` for each
+    const keys = await this.database.execute('zrange', resultKey, offset, (offset + LIMIT) - 1);
+    const commands = keys.map((k) => ['get', k]);
+
+    return this.database.execute('multi', commands)
+      .then((results) => ({
+        currentPage: options.page,
+        stations: results.map(JSON.parse),
+        pageCount: Math.ceil(count / LIMIT)
+      }))
+      .catch((error) => {
+        logger.error(error);
+        return Promise.reject(new Error(`Failed to fetch stations using options ${JSON.stringify(options)}.`));
       });
   }
 
   /**
    * Fetches the media stream url for a given radio station
-   * @todo    This should resolve w/ a formal `stream` object instead of a string
-   * @param   {Object} station - Radio station object
+   * @param   {Object} title - Title of the radio station to find
    * @returns {Promise} Fetch operation
    */
-  static fetchStream(station) {
-    if (!station) {
-      const error = new Error('Missing `station` for `Station::fetchStream`');
-      return Promise.reject(error);
-    }
+  fetchStream(title) {
+    return this.database.execute('get', `station:${title}.primary_format_stream`)
+      .then(streamURL => {
+        if (streamURL === null) {
+          return Promise.reject(new Error(`Station stream for ${title} not found`));
+        }
 
-    const streamURL = station.urls.streams.find(stationURL => stationURL.rel === 'primary_format_stream');
+        // If already an actual media resource (not a playlist), use that
+        if (!/.pls$|.m3u$/.test(streamURL)) {
+          return Promise.resolve(streamURL);
+        }
 
-    if (!streamURL) {
-      const error = new Error('No stream URL found for `Station::fetchStream`');
-      return Promise.reject(error);
-    }
+        // Grab the media resource using the playlist url
+        return axios.get(streamURL).then(response => {
+          const content = response.data.split('\n');
+          const fileURL = content.find(line => /^File1=/.test(line));
 
-    /** @todo canonical stream resource obj. */
-    if (!/.pls$|.m3u$/.test(streamURL)) {
-      return Promise.resolve(streamURL.href);
-    }
-
-    // Grab the first url in the playlist response
-    return axios.get(streamURL.href).then(response => {
-      const content = response.data.split('\n');
-
-      /** @todo Move this to a function */
-      /** @todo Should this return with `url.path`? */
-      return content.find(line => {
-        const parsedURL = url.parse(line);
-        return parsedURL.protocol && parsedURL.hostname;
+          // Get the INI value
+          return fileURL.replace(/^File1=/, '');
+        });
+      })
+      .catch(error => {
+        logger.error(error);
+        return Promise.reject(new Error(`Failed to fetch stream for station with title: ${title}.`));
       });
-    });
   }
 }
 

@@ -13,12 +13,30 @@ const Boom             = require('boom');
 const formatLinkHeader = require('format-link-header');
 const Joi              = require('joi');
 const toPairs          = require('lodash/toPairs');
+const Database         = require('./lib/database');
 const Station          = require('./models/station');
-const stationSchema    = require('./schemas/station');
+const filterSchema     = require('./schemas/filter');
+const geoNearSchema    = require('./schemas/geo-near');
 
 const schemas = {
-  station: stationSchema
+  filter: filterSchema,
+  geoNear: geoNearSchema
 };
+
+const database = new Database();
+const station = new Station(database);
+
+if (process.env.NODE_ENV === 'production') {
+  database.connect({
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT
+  });
+} else {
+  database.connect({
+    host: '127.0.0.1',
+    port: 6379
+  });
+}
 
 /** @todo  Strip `Error#message` from error responses */
 module.exports = [
@@ -29,7 +47,8 @@ module.exports = [
       cors: true,
       validate: {
         query: {
-          filter: schemas.station,
+          filter: schemas.filter,
+          geoNear: schemas.geoNear,
           sort: Joi.string(),
           page: Joi.number()
         }
@@ -37,14 +56,19 @@ module.exports = [
     },
     handler: (request, reply) => {
       const filter  = request.query.filter ? new Map(toPairs(request.query.filter)) : null;
-      const options = {
-        page: request.query.page,
-        sort: request.query.sort,
-        filter
-      };
+      const geoNear = request.query.geoNear || null;
+      const options = { filter, geoNear };
+
+      if (request.query.page) {
+        options.page = request.query.page;
+      }
+
+      if (request.query.sort) {
+        options.sortBy = request.query.sort;
+      }
 
       /** @todo Document what's happening here */
-      Station.list(options)
+      station.list(options)
         .then(results => {
           const links     = {};
           const prevPage  = (results.currentPage - 1) || null;
@@ -95,7 +119,7 @@ module.exports = [
     },
     handler: (request, reply) => {
       /** @todo Document what's happening here */
-      Station.fetch(request.params.title)
+      station.fetch(request.params.title)
         .then(result => {
           if (result) {
             reply(result);
@@ -103,9 +127,7 @@ module.exports = [
             reply(Boom.notFound('Station record not found'));
           }
         })
-        .catch(err => {
-          reply(Boom.wrap(err, 500));
-        });
+        .catch(Boom.err);
     }
   },
 
@@ -120,23 +142,15 @@ module.exports = [
         }
       }
     },
-    handler: (request, reply) => {
-      /** @todo Document what's happening here */
-      Station.fetch(request.params.title)
-        .then(result => {
-          if (result) {
-            const station = result;
-
-            Station.fetchStream(station)
-              .then(uri => reply(uri).type('text/plain'))
-              .catch(Boom.notFound('Station stream url not found'));
-          } else {
-            reply(Boom.notFound('Station record not found'));
-          }
+    handler: (request, reply) => (
+      station.fetchStream(request.params.title)
+        .then(streamURL => {
+          const response = reply(streamURL);
+          response.type('text/plain');
         })
         .catch(err => {
           reply(Boom.wrap(err, 500));
-        });
-    }
+        })
+    )
   }
 ];
