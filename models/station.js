@@ -55,9 +55,7 @@ class Station {
 
     const offset = (options.page > 1) ? ((options.page - 1) * LIMIT) : 0;
     const lookupKeys = [];
-    let resultExists;
     let resultKey = 'station';
-    let count;
 
     if (options.filter && options.filter.size) {
       resultKey += `.filter.${
@@ -76,14 +74,11 @@ class Station {
 
     if (!options.filter && !options.geoNear) {
       resultKey = `station.${options.sortBy}`;
-      resultExists = true;
-    } else {
-      resultExists = Boolean(await this.database.execute('exists', resultKey));
     }
 
     // Apply geolocation searching
     /** @todo use `EXPIRE` command */
-    if (options.geoNear && !resultExists) {
+    if (options.geoNear) {
       const [latitude, longitude] = options.geoNear.coordinates;
       const distance = options.geoNear.distance || 50;
       const geoSetKey = `station.geoNear.coordinates:${latitude},${longitude};distance:${distance}`;
@@ -106,19 +101,15 @@ class Station {
       lookupKeys.push({ name: 'station.title', weight: 2 });
     }
 
-    // Either count the existing full page of keys or create a page for this filter set
+    // Create a page for this filter set
     /** @todo use `EXPIRE` command */
-    if (resultExists) {
-      count = await this.database.execute('zcount', resultKey, '-inf', '+inf');
-    } else {
-      count = await this.database.execute('zinterstore', resultKey, lookupKeys.length, ...lookupKeys.map(k => k.name), 'weights', ...lookupKeys.map(k => k.weight));
-    }
+    const count = await this.database.execute('zinterstore', resultKey, lookupKeys.length, ...lookupKeys.map(k => k.name), 'weights', ...lookupKeys.map(k => k.weight));
 
     // Paginate by obtaining a subset of matching keys, then executing redis `GET` for each
     const keys = await this.database.execute('zrange', resultKey, offset, (offset + LIMIT) - 1);
     const commands = keys.map((k) => ['get', k]);
 
-    return this.database.execute('multi', commands)
+    return this.database.execute('batch', commands)
       .then((results) => ({
         currentPage: options.page,
         stations: results.map(JSON.parse),

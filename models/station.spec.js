@@ -42,8 +42,8 @@ test.scenarios = new Map()
     const execute = global.sandbox.stub();
     const database = { execute };
 
-    execute.withArgs('multi').resolves(test.values.get('stations-stringified'));
-    execute.withArgs('zcount').resolves(2);
+    execute.withArgs('batch').resolves(test.values.get('stations-stringified'));
+    execute.withArgs('zinterstore').resolves(2);
     execute.withArgs('zrange').resolves(test.values.get('titles'));
 
     station = new Station(database);
@@ -55,8 +55,8 @@ test.scenarios = new Map()
     const execute = global.sandbox.stub();
     const database = { execute };
 
-    execute.withArgs('multi').resolves(test.values.get('stations-stringified'));
-    execute.withArgs('zcount').resolves(1);
+    execute.withArgs('batch').resolves(test.values.get('stations-stringified'));
+    execute.withArgs('zinterstore').resolves(2);
     execute.withArgs('zrange').resolves(test.values.get('titles'));
 
     station = new Station(database);
@@ -68,8 +68,7 @@ test.scenarios = new Map()
     const execute = global.sandbox.stub();
     const database = { execute };
 
-    execute.withArgs('exists').resolves(0);
-    execute.withArgs('multi').resolves(test.values.get('stations-stringified'));
+    execute.withArgs('batch').resolves(test.values.get('stations-stringified'));
     execute.withArgs('zinterstore').resolves(2);
     execute.withArgs('zrange').resolves(test.values.get('titles'));
 
@@ -107,7 +106,7 @@ describe('Station', () => {
       beforeEach(test.scenarios.get('#list'));
 
       it('should execute redis `GET` for each station', () => (
-        station.database.execute.should.have.been.calledWithExactly('multi', [
+        station.database.execute.should.have.been.calledWithExactly('batch', [
           ['get', 'station:<title>'],
           ['get', 'station:<title>']
         ])
@@ -122,7 +121,7 @@ describe('Station', () => {
       beforeEach(test.scenarios.get('#list-with-sortBy'));
 
       it('should execute redis `GET` for each station', () => (
-        station.database.execute.should.have.been.calledWithExactly('multi', [
+        station.database.execute.should.have.been.calledWithExactly('batch', [
           ['get', 'station:<title>'],
           ['get', 'station:<title>']
         ])
@@ -137,7 +136,7 @@ describe('Station', () => {
       beforeEach(test.scenarios.get('#list-with-filter'));
 
       it('should execute redis `GET` for each station', () => (
-        station.database.execute.should.have.been.calledWithExactly('multi', [
+        station.database.execute.should.have.been.calledWithExactly('batch', [
           ['get', 'station:<title>'],
           ['get', 'station:<title>']
         ])

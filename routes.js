@@ -4,7 +4,7 @@
  * @requires boom
  * @requires joi
  * @requires lodash/toPairs
- * @requires stations
+ * @requires station
  */
 
 'use strict';
