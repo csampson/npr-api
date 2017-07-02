@@ -1,6 +1,6 @@
 /**
- * @overview API `station` object schema
- * @module   station
+ * @overview API `filter` object schema
+ * @module   filter
  * @requires joi
  */
 
@@ -8,17 +8,15 @@
 
 const Joi = require('joi');
 
-const station = Joi.object().keys({
+const filter = Joi.object().keys({
   band: Joi.string(),
   call: Joi.string(),
   format: Joi.string(),
   frequency: Joi.number(),
-  geolocation: Joi.array().items(Joi.number()),
   market_city: Joi.string(),
   market_state: Joi.string(),
   name: Joi.string(),
-  tagline: Joi.string(),
   title: Joi.string()
 });
 
-module.exports = station;
+module.exports = filter;
