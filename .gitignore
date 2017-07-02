@@ -1,6 +1,3 @@
-# App
-config/secrets.json
-
 # Node.js
 *npm-debug.log
 node_modules
@@ -9,8 +6,8 @@ node_modules
 .vscode
 
 # Ops
-db.log
 newrelic_agent.log
 
 # Testing
-coverage
+.nyc_output
+test/coverage
