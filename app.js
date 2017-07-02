@@ -17,7 +17,8 @@
  * @see {@link https://opbeat.com/docs/articles/nodejs-agent-api/}
  */
 if (process.env.NODE_ENV === 'production') {
-  require('opbeat').start();
+  /** @todo re-enable when "Missing module core-util-is issue" in prod is resolved */
+  // require('opbeat').start();
 }
 
 const Hapi   = require('hapi');
