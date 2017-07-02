@@ -1,7 +1,6 @@
 # The Open Public Radio API
 
 [![Build Status](https://travis-ci.org/openpublicradio/api.svg?branch=master)](https://travis-ci.org/openpublicradio/api)
-[![bitHound Overall Score](https://www.bithound.io/github/openpublicradio/api/badges/score.svg)](https://www.bithound.io/github/openpublicradio/api)
 [![Code Climate](https://codeclimate.com/github/openpublicradio/api/badges/gpa.svg)](https://codeclimate.com/github/openpublicradio/api)
 [![Test Coverage](https://codeclimate.com/github/openpublicradio/api/badges/coverage.svg)](https://codeclimate.com/github/openpublicradio/api/coverage)
 
@@ -11,18 +10,18 @@ A REST api for querying information about [NPR](http://npr.org) member stations.
 
 ## Requirements
 
-- RethinkDB
-- Node.js 6.x
-- npm 3.x
+- Redis 3.2.x
+- Node.js 8.x
+- npm 5.x
 
 ## Installing
 
 Run `npm install` to grab the project dependencies.   
-Run `npm run setup-database` to create and populate an `open_public_radio` database
+Run `npm run setup-database` to populate Redis with station data from the static JSON located in `data/`.
 
 ## Running
 
-Start RethinkDB on its default port.   
+Start Redis on its default port.
 Run `npm start` to spin up a local development server.
 
 ## Testing
