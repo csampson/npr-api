@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "axios": "^0.15.3",
-    "boom": "^4.2.0",
-    "bunyan": "^1.8.5",
+    "boom": "^5.1.0",
+    "bunyan": "^1.8.10",
     "format-link-header": "^2.0.0",
     "hapi": "^16.1.1",
     "hapi-qs": "^1.1.3",

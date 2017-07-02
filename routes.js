@@ -128,7 +128,9 @@ module.exports = [
             reply(Boom.notFound('Station record not found'));
           }
         })
-        .catch(Boom.err);
+        .catch((err) => {
+          reply(Boom.wrap(err, 500));
+        });
     }
   },
 
