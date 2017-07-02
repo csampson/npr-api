@@ -6,19 +6,18 @@
  * @requires  hapi
  * @requires  hapi-qs
  * @requires  logger
- * @requires  newrelic
+ * @requires  opbeat
  * @requires  routes
  */
 
 'use strict';
 
 /**
- * Hooks Newrelic monitoring up from this point forward
- * @see {@link https://docs.newrelic.com/docs/agents/nodejs-agent/installation-configuration/install-nodejs-agent}
+ * Hooks Opbeat monitoring up from this point forward
+ * @see {@link https://opbeat.com/docs/articles/nodejs-agent-api/}
  */
-
 if (process.env.NODE_ENV === 'production') {
-  require('newrelic');
+  require('opbeat').start();
 }
 
 const Hapi   = require('hapi');
