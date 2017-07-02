@@ -29,7 +29,8 @@ const station = new Station(database);
 if (process.env.NODE_ENV === 'production') {
   database.connect({
     host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD
   });
 } else {
   database.connect({
