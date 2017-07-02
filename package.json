@@ -40,5 +40,8 @@
     "sinon": "^1.17.7",
     "sinon-as-promised": "^4.0.0",
     "sinon-chai": "^2.8.0"
+  },
+  "peerDependencies": {
+    "core-util-is": "^1.0.2"
   }
 }
