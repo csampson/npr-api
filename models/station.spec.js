@@ -42,9 +42,8 @@ test.scenarios = new Map()
     const execute = global.sandbox.stub();
     const database = { execute };
 
-    execute.withArgs('batch').resolves(test.values.get('stations-stringified'));
-    execute.withArgs('zinterstore').resolves(2);
-    execute.withArgs('zrange').resolves(test.values.get('titles'));
+    execute.withArgs('mget').resolves(test.values.get('stations-stringified'));
+    execute.withArgs('multi').resolves([2, test.values.get('titles')]);
 
     station = new Station(database);
     operation = station.list();
@@ -55,9 +54,8 @@ test.scenarios = new Map()
     const execute = global.sandbox.stub();
     const database = { execute };
 
-    execute.withArgs('batch').resolves(test.values.get('stations-stringified'));
-    execute.withArgs('zinterstore').resolves(2);
-    execute.withArgs('zrange').resolves(test.values.get('titles'));
+    execute.withArgs('mget').resolves(test.values.get('stations-stringified'));
+    execute.withArgs('multi').resolves([2, test.values.get('titles')]);
 
     station = new Station(database);
     operation = station.list({ sortBy: 'title' });
@@ -68,9 +66,8 @@ test.scenarios = new Map()
     const execute = global.sandbox.stub();
     const database = { execute };
 
-    execute.withArgs('batch').resolves(test.values.get('stations-stringified'));
-    execute.withArgs('zinterstore').resolves(2);
-    execute.withArgs('zrange').resolves(test.values.get('titles'));
+    execute.withArgs('mget').resolves(test.values.get('stations-stringified'));
+    execute.withArgs('multi').resolves([2, test.values.get('titles')]);
 
     station = new Station(database);
     operation = station.list({ filter: new Map().set('band', 'am') });
@@ -105,10 +102,10 @@ describe('Station', () => {
     context('when given no options', () => {
       beforeEach(test.scenarios.get('#list'));
 
-      it('should execute redis `GET` for each station', () => (
-        station.database.execute.should.have.been.calledWithExactly('batch', [
-          ['get', 'station:<title>'],
-          ['get', 'station:<title>']
+      it('should execute redis `MGET` for stations', () => (
+        station.database.execute.should.have.been.calledWithExactly('mget', [
+          'station:<title>',
+          'station:<title>'
         ])
       ));
 
@@ -120,10 +117,10 @@ describe('Station', () => {
     context('when sorting is applied', () => {
       beforeEach(test.scenarios.get('#list-with-sortBy'));
 
-      it('should execute redis `GET` for each station', () => (
-        station.database.execute.should.have.been.calledWithExactly('batch', [
-          ['get', 'station:<title>'],
-          ['get', 'station:<title>']
+      it('should execute redis `MGET` for stations', () => (
+        station.database.execute.should.have.been.calledWithExactly('mget', [
+          'station:<title>',
+          'station:<title>'
         ])
       ));
 
@@ -135,10 +132,10 @@ describe('Station', () => {
     context('when filtering is applied', () => {
       beforeEach(test.scenarios.get('#list-with-filter'));
 
-      it('should execute redis `GET` for each station', () => (
-        station.database.execute.should.have.been.calledWithExactly('batch', [
-          ['get', 'station:<title>'],
-          ['get', 'station:<title>']
+      it('should execute redis `MGET` for stations', () => (
+        station.database.execute.should.have.been.calledWithExactly('mget', [
+          'station:<title>',
+          'station:<title>'
         ])
       ));
 

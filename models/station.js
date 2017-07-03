@@ -101,15 +101,15 @@ class Station {
       lookupKeys.push({ name: 'station.title', weight: 2 });
     }
 
-    // Create a page for this filter set
-    /** @todo use `EXPIRE` command */
-    const count = await this.database.execute('zinterstore', resultKey, lookupKeys.length, ...lookupKeys.map(k => k.name), 'weights', ...lookupKeys.map(k => k.weight));
+    /** @todo `EXPIRE` the zinterstore-created key */
+    const [count, keys] = await this.database.execute('multi', [
+      // Create a page for this filter set
+      ['zinterstore', resultKey, lookupKeys.length, ...lookupKeys.map(k => k.name), 'weights', ...lookupKeys.map(k => k.weight)],
+      // Paginate by obtaining a subset of matching keys
+      ['zrange', resultKey, offset, (offset + LIMIT) - 1]
+    ]);
 
-    // Paginate by obtaining a subset of matching keys, then executing redis `GET` for each
-    const keys = await this.database.execute('zrange', resultKey, offset, (offset + LIMIT) - 1);
-    const commands = keys.map((k) => ['get', k]);
-
-    return this.database.execute('batch', commands)
+    return this.database.execute('mget', keys)
       .then((results) => ({
         currentPage: options.page,
         stations: results.map(JSON.parse),
