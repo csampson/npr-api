@@ -17,7 +17,7 @@
  * @see {@link https://opbeat.com/docs/articles/nodejs-agent-api/}
  */
 if (process.env.NODE_ENV === 'production') {
-  require('opbeat').start();
+  require('newrelic');
 }
 
 const Hapi   = require('hapi');
