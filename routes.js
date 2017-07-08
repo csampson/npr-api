@@ -43,6 +43,13 @@ if (process.env.NODE_ENV === 'production') {
 module.exports = [
   {
     method: 'GET',
+    path: `/${process.env.LOADER_TOKEN}/`,
+    handler: (reqest, reply) => {
+      reply(process.env.LOADER_TOKEN);
+    }
+  },
+  {
+    method: 'GET',
     path: '/stations',
     config: {
       cors: true,
