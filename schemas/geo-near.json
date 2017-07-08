@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "coordinates": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [{
+        "anyOf": [
+          {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 90
+          },
+          {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          }
+        ]
+      }]
+    },
+    "distance": {
+      "minimum": 0,
+      "type": "number"
+    }
+  }
+}

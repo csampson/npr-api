@@ -1,30 +1,30 @@
 /**
  * @overview Hapi route configurations
  * @module   routes
- * @requires boom
- * @requires joi
+ * @requires ajv
  * @requires lodash/toPairs
  * @requires station
+ * @requires qs
  */
 
 'use strict';
 
-const Boom             = require('boom');
+const Ajv = require('ajv');
 const formatLinkHeader = require('format-link-header');
-const Joi              = require('joi');
-const toPairs          = require('lodash/toPairs');
-const Database         = require('./lib/database');
-const Station          = require('./models/station');
-const filterSchema     = require('./schemas/filter');
-const geoNearSchema    = require('./schemas/geo-near');
+const toPairs = require('lodash/toPairs');
+const qs = require('qs');
 
-const schemas = {
-  filter: filterSchema,
-  geoNear: geoNearSchema
-};
+const Database = require('./lib/database');
+const Station = require('./models/station');
+const filterSchema = require('./schemas/filter');
+const geoNearSchema = require('./schemas/geo-near');
 
+const ajv = new Ajv({ jsonPointers: true });
 const database = new Database();
 const station = new Station(database);
+
+ajv.addSchema(filterSchema, 'filter');
+ajv.addSchema(geoNearSchema, 'geoNear');
 
 if (process.env.NODE_ENV === 'production') {
   database.connect({
@@ -51,20 +51,24 @@ module.exports = [
   {
     method: 'GET',
     path: '/stations',
-    config: {
-      cors: true,
-      validate: {
-        query: {
-          filter: schemas.filter,
-          geoNear: schemas.geoNear,
-          sort: Joi.string(),
-          page: Joi.number()
+    handler: async (context, next) => {
+      const { request, response } = context;
+      const params = qs.parse(request.querystring);
+
+      // Validation
+      if (params.filter) {
+        const isValid = ajv.validate('filter', params.filter);
+
+        if (!isValid) {
+          response.status = 400;
+          response.body = ajv.errorsText();
+
+          return next();
         }
       }
-    },
-    handler: (request, reply) => {
-      const filter  = request.query.filter ? new Map(toPairs(request.query.filter)) : null;
-      const geoNear = request.query.geoNear || null;
+
+      const filter  = params.filter ? new Map(toPairs(params.filter)) : null;
+      const geoNear = params.geoNear || null;
       const options = { filter, geoNear };
 
       if (request.query.page) {
@@ -75,15 +79,13 @@ module.exports = [
         options.sortBy = request.query.sort;
       }
 
-      /** @todo Document what's happening here */
-      station.list(options)
+      return station.list(options)
         .then(results => {
           const links     = {};
           const prevPage  = (results.currentPage - 1) || null;
           const nextPage  = (results.currentPage + 1) === results.pageCount ? null : results.currentPage + 1;
           const lastPage  = results.pageCount;
-          const endpoint  = `${request.server.info.protocol}://${request.info.host}${request.path}`;
-          const response  = reply(results.stations);
+          const endpoint  = `${context.protocol}://${context.host}${context.path}`;
 
           if (nextPage) {
             links.next = {
@@ -105,62 +107,51 @@ module.exports = [
           }
 
           if (Object.keys(links).length) {
-            response.header('Link', formatLinkHeader(links));
+            response.headers.Link = formatLinkHeader(links);
           }
+
+          response.status = 200;
+          response.body = results.stations;
         })
         .catch(err => {
-          reply(Boom.wrap(err, 500));
+          response.status = 500;
         });
     }
   },
 
   {
-    method: 'GET',
-    path: '/stations/{title}',
-    config: {
-      cors: true,
-      validate: {
-        params: {
-          title: Joi.string()
-        }
-      }
-    },
-    handler: (request, reply) => {
-      /** @todo Document what's happening here */
-      station.fetch(request.params.title)
+    path: '/stations/:title',
+    handler: async (context, next) => {
+      const { response, params } = context;
+
+      return station.fetch(params.title)
         .then(result => {
           if (result) {
-            reply(result);
+            response.body = result;
           } else {
-            reply(Boom.notFound('Station record not found'));
+            response.status = 404;
           }
         })
         .catch((err) => {
-          reply(Boom.wrap(err, 500));
+          response.status = 500;
+          response.body = err.message;
         });
     }
   },
 
   {
-    method: 'GET',
-    path: '/stations/{title}/stream',
-    config: {
-      cors: true,
-      validate: {
-        params: {
-          title: Joi.string()
-        }
-      }
-    },
-    handler: (request, reply) => (
-      station.fetchStream(request.params.title)
+    path: '/stations/:title/stream',
+    handler: async (context, next) => {
+      const { response, params } = context;
+
+      return station.fetchStream(params.title)
         .then(streamURL => {
-          const response = reply(streamURL);
-          response.type('text/plain');
+          response.body = streamURL;
         })
         .catch(err => {
-          reply(Boom.wrap(err, 500));
-        })
-    )
+          response.status = 500;
+          response.body = err.message;
+        });
+    }
   }
 ];

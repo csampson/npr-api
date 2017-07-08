@@ -51,14 +51,20 @@ class Station {
    * @returns {Promise} List operation
    */
   async list(options = {}) {
-    options = Object.assign({ filter: null, geoNear: null, page: 1, sortBy: 'title' }, options);
+    options = Object.assign({
+      filter: null,
+      geoNear: null,
+      page: 1,
+      sortBy: 'title',
+    }, options);
 
     const offset = (options.page > 1) ? ((options.page - 1) * LIMIT) : 0;
-    const lookupKeys = [];
-    let resultKey = 'station';
+    const intersectKeys = [];
+    let lookupKey = 'station';
 
+    // Begin building a unique key for this filter, e.g. station.filter.frequency:89.9
     if (options.filter && options.filter.size) {
-      resultKey += `.filter.${
+      lookupKey += `.filter.${
         [...options.filter.entries()]
           .sort()
           .map(([attr, value]) => `${attr}:${snakeCase(value).toLowerCase()}`)
@@ -69,11 +75,11 @@ class Station {
     if (options.geoNear) {
       const [latitude, longitude] = options.geoNear.coordinates;
       const distance = options.geoNear.distance || 50;
-      resultKey += `.geoNear.coordinates:${longitude},${latitude};distance:${distance}`;
+      lookupKey += `.geoNear.coordinates:${longitude},${latitude};distance:${distance}`;
     }
 
     if (!options.filter && !options.geoNear) {
-      resultKey = `station.${options.sortBy}`;
+      lookupKey = `station.${options.sortBy}`;
     }
 
     // Apply geolocation searching
@@ -84,29 +90,29 @@ class Station {
       const geoSetKey = `station.geoNear.coordinates:${latitude},${longitude};distance:${distance}`;
 
       await this.database.execute('georadius', 'station.geolocation', longitude, latitude, distance, 'mi', 'store', geoSetKey);
-      lookupKeys.push({ name: geoSetKey, weight: 1 });
+      intersectKeys.push({ name: geoSetKey, weight: 1 });
     }
 
     // Apply filtering
     if (options.filter) {
       options.filter.forEach((value, attr) => {
-        lookupKeys.push({ name: `station.${attr}:${snakeCase(value).toLowerCase()}`, weight: 1 });
+        intersectKeys.push({ name: `station.${attr}:${snakeCase(value).toLowerCase()}`, weight: 1 });
       });
     }
 
     // Apply sorting
     if (options.sortBy) {
-      lookupKeys.push({ name: `station.${options.sortBy}`, weight: 2 });
+      intersectKeys.push({ name: `station.${options.sortBy}`, weight: 2 });
     } else {
-      lookupKeys.push({ name: 'station.title', weight: 2 });
+      intersectKeys.push({ name: 'station.title', weight: 2 });
     }
 
     /** @todo `EXPIRE` the zinterstore-created key */
     const [count, keys] = await this.database.execute('multi', [
-      // Create a page for this filter set
-      ['zinterstore', resultKey, lookupKeys.length, ...lookupKeys.map(k => k.name), 'weights', ...lookupKeys.map(k => k.weight)],
+      // Filter by finding the intersection of all filter keys
+      ['zinterstore', lookupKey, intersectKeys.length, ...intersectKeys.map(k => k.name), 'weights', ...intersectKeys.map(k => k.weight)],
       // Paginate by obtaining a subset of matching keys
-      ['zrange', resultKey, offset, (offset + LIMIT) - 1]
+      ['zrange', lookupKey, offset, (offset + LIMIT) - 1]
     ]);
 
     return this.database.execute('mget', keys)

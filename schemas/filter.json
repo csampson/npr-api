@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema",
+  "additionalProperties": false,
+  "properties": {
+    "band": {
+      "enum": [
+          "am", "AM",
+          "fm", "FM"
+      ],
+      "type": "string"
+    },
+    "call": {
+      "type": "string"
+    },
+    "format": {
+      "enum": [
+        "adult_album_alternative",
+        "americana",
+        "classical",
+        "college",
+        "grade_school_k_12",
+        "hot_ac",
+        "jazz",
+        "news",
+        "oldies",
+        "public_radio",
+        "religious",
+        "urban_contemporary",
+        "variety"
+      ],
+      "type": "string"
+    },
+    "frequency": {
+      "type": "number"
+    },
+    "market_city": {
+      "type": "string"
+    },
+    "market_state": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

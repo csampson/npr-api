@@ -1,43 +1,33 @@
 /* eslint "global-require": "off" */
 
 /**
- * @overview  Application entry-point
- * @module    app
- * @requires  hapi
- * @requires  hapi-qs
- * @requires  logger
- * @requires  opbeat
- * @requires  routes
+ * @overview Application entry-point
+ * @requires koa
+ * @requires koa-router
+ * @requires newrelic
+ * @requires routes
  */
 
 'use strict';
 
 /**
- * Hooks Opbeat monitoring up from this point forward
- * @see {@link https://opbeat.com/docs/articles/nodejs-agent-api/}
+ * Activates New Relic monitoring from this point forward
  */
 if (process.env.NODE_ENV === 'production') {
   require('newrelic');
 }
 
-const Hapi   = require('hapi');
-const HapiQS = require('hapi-qs');
-const logger = require('./lib/logger');
+const Koa = require('koa');
+const router = require('koa-router')();
 const routes = require('./routes');
 
-const server     = new Hapi.Server();
-const connection = { port: process.env.PORT || 3000 };
+const app = new Koa();
 
-function init(err) {
-  if (err) {
-    logger.fatal(err);
-    throw new Error(err);
-  }
+routes.forEach((route) => {
+  router.get(route.path, route.handler);
+});
 
-  logger.info(`Server running at: ${server.info.uri}`);
-}
+app.use(router.routes());
+app.use(router.allowedMethods());
 
-server.connection(connection);
-server.register(HapiQS);
-server.route(routes);
-server.start(init);
+app.listen(process.env.PORT || 3000);

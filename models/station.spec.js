@@ -9,10 +9,10 @@ let station;
 let operation;
 
 test.values = new Map()
+  .set('error', new Error())
   .set('station-stringified', '{ "title": "<title>" }')
   .set('stations-stringified', ['{ "title": "<title>" }', '{ "title": "<title>" }'])
   .set('titles', ['station:<title>', 'station:<title>'])
-  .set('error', new Error())
   .set('#fetch-resolved', { title: '<title>' })
   .set('#list-resolved', { currentPage: 1, stations: [{ title: '<title>' }, { title: '<title>' }], pageCount: 1 })
   .set('#list-resolved-with-sorting', { currentPage: 1, stations: [{ title: '<title>' }, { title: '<title>' }], pageCount: 1 })
@@ -165,7 +165,9 @@ describe('Station', () => {
     });
   });
 
-  xdescribe('#fetchStream', () => {
+  describe('#fetchStream', () => {
+    context('when successsful', () => {
 
+    });
   });
 });
