@@ -26,20 +26,17 @@ const stations = files.map(importStation).reduce((prev, current) => prev.concat(
 const database = new Database();
 
 database.connect({
-  host: '127.0.0.1',
-  port: 6379
+  host: 'redis'
 });
 
 database.client.on('error', (err) => {
-  throw new Error(`Stations import failed: ${err}`);
+  throw new Error(`Failed to sync station records: ${err}`);
 });
 
 let operations = sortBy(stations, 'title').map((station, index) => {
   const key = `station:${station.title}`;
   const { longitude, latitude } = station.geolocation;
   const commands = [];
-
-  console.log(`Importing [${key}]...`);
 
   /** @todo Clean up static station data */
   station.coordinates = [station.geolocation.latitude, station.geolocation.longitude];
@@ -74,7 +71,6 @@ let operations = sortBy(stations, 'title').map((station, index) => {
 
 // Add sorted set indexes (for sorting by station attr)
 ['band', 'call', 'format', 'frequency', 'market_city', 'market_state', 'name', 'title'].forEach((key) => {
-  console.log(`Indexing stations sorted by: ${key}...`);
 
   operations = operations.concat(
     sortBy(stations, key).map((station, index) => (
@@ -85,7 +81,7 @@ let operations = sortBy(stations, 'title').map((station, index) => {
 
 Promise.all(operations)
   .then(() => {
-    console.log('Done.');
+    console.log('Finished syncing station records.');
     database.client.quit();
   })
   .catch((err) => {

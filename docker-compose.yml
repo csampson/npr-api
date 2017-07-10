@@ -1,0 +1,15 @@
+version: '3.2'
+
+services:
+    node:
+        build:
+            context: .
+            dockerfile: ./docker/node/Dockerfile
+        links:
+            - redis
+        ports:
+            - 80:3000
+    redis:
+        build: ./docker/redis
+        ports:
+            - 6379

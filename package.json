@@ -7,7 +7,7 @@
   },
   "engine-strict": true,
   "scripts": {
-    "start": "node ./app",
+    "start": "npm run setup-database && node ./app",
     "test": "nyc mocha -R spec ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
     "test:unit": "mocha ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
     "import-data": "node ./scripts/import-npr-stations",

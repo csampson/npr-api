@@ -26,18 +26,9 @@ const schemas = {
 const database = new Database();
 const station = new Station(database);
 
-if (process.env.NODE_ENV === 'production') {
-  database.connect({
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    password: process.env.REDIS_PASSWORD
-  });
-} else {
-  database.connect({
-    host: '127.0.0.1',
-    port: 6379
-  });
-}
+database.connect({
+  host: 'redis'
+});
 
 /** @todo  Strip `Error#message` from error responses */
 module.exports = [
