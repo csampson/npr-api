@@ -25,11 +25,6 @@ const files = fs.readdirSync(`${__dirname}`).filter(file => file !== '_setup.js'
 const stations = files.map(importStation).reduce((prev, current) => prev.concat(current), []);
 const database = new Database();
 
-database.connect({
-  host: '127.0.0.1',
-  port: 6379
-});
-
 database.client.on('error', (err) => {
   throw new Error(`Stations import failed: ${err}`);
 });
