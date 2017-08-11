@@ -43,9 +43,9 @@ if (process.env.NODE_ENV === 'production') {
 module.exports = [
   {
     method: 'GET',
-    path: `/${process.env.LOADER_TOKEN}/`,
-    handler: (reqest, reply) => {
-      reply(process.env.LOADER_TOKEN);
+    path: `/${process.env.LOADER_TOKEN}`,
+    handler: (context, next) => {
+      context.response.body = process.env.LOADER_TOKEN;
     }
   },
   {
