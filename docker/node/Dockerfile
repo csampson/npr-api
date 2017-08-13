@@ -1,15 +1,12 @@
-FROM node:8.1.4-alpine
+FROM node:8.3.0-alpine
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+RUN mkdir -p /opt/app
+WORKDIR /opt/app
 
-ARG NODE_ENV
-ENV NODE_ENV $NODE_ENV
+COPY package.json /opt/app/
+RUN npm install --production
+COPY . /opt/app
+
 ENV PORT 3000
-
-COPY package.json /usr/src/app/
-RUN npm install && npm cache clean --force
-COPY . /usr/src/app
-
 EXPOSE 3000
 CMD ["npm", "start"]
