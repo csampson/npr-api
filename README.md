@@ -32,4 +32,3 @@ Use `npm test` to run the unit tests.
 
 - This requires `NPR_API_KEY` and `GOOGLE_API_KEY` environment variables.
 - Use `npm run db:resync` to re-import station data from the NPR api and location data from Google.
-
