@@ -30,8 +30,15 @@ const station = new Station(database);
 module.exports = [
   {
     method: 'GET',
+    path: '/health',
+    handler: (request, reply) => {
+      reply()
+    }
+  },
+  {
+    method: 'GET',
     path: `/${process.env.LOADER_TOKEN}/`,
-    handler: (reqest, reply) => {
+    handler: (request, reply) => {
       reply(process.env.LOADER_TOKEN);
     }
   },
