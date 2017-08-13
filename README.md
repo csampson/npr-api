@@ -10,20 +10,26 @@ A REST api for querying information about [NPR](http://npr.org) member stations.
 
 ## Requirements
 
-- Redis 3.2.x
-- Node.js 8.x
-- npm 5.x
+- Node.js 8.3.x
+- npm 5.3.x
+- Docker 17.x
+- docker-compose 1.x
 
 ## Installing
 
 Run `npm install` to grab the project dependencies.   
-Run `npm run setup-database` to populate Redis with station data from the static JSON located in `data/`.
+Run `docker-compose build` to build the `web` and `db` docker images (Node.js app and Redis, respectively).
 
 ## Running
 
-Start Redis on its default port.
-Run `npm start` to spin up a local development server.
+Run with `docker-compose up`.
 
 ## Testing
 
-Run `npm test` to run the unit tests.
+Use `npm test` to run the unit tests.
+
+## Updating Data
+
+- This requires `NPR_API_KEY` and `GOOGLE_API_KEY` environment variables.
+- Use `npm run db:resync` to re-import station data from the NPR api and location data from Google.
+
