@@ -34,8 +34,6 @@ let operations = sortBy(stations, 'title').map((station, index) => {
   const { longitude, latitude } = station.geolocation;
   const commands = [];
 
-  console.log(`Importing [${key}]...`);
-
   /** @todo Clean up static station data */
   station.coordinates = [station.geolocation.latitude, station.geolocation.longitude];
   delete station.geolocation;
@@ -69,14 +67,14 @@ let operations = sortBy(stations, 'title').map((station, index) => {
 
 // Add sorted set indexes (for sorting by station attr)
 ['band', 'call', 'format', 'frequency', 'market_city', 'market_state', 'name', 'title'].forEach((key) => {
-  console.log(`Indexing stations sorted by: ${key}...`);
-
   operations = operations.concat(
     sortBy(stations, key).map((station, index) => (
       database.execute('zadd', `station.${key}`, index, `station:${station.title}`)
     ))
   );
 });
+
+console.log('Loading station records...');
 
 Promise.all(operations)
   .then(() => {
