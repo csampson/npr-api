@@ -17,7 +17,6 @@ A REST api for querying information about [NPR](http://npr.org) member stations.
 
 ## Installing
 
-Run `npm install` to grab the project dependencies.   
 Run `docker-compose build` to build the `web` and `db` docker images (Node.js app and Redis, respectively).
 
 ## Running
