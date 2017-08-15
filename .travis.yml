@@ -8,4 +8,5 @@ before_script:
 script:
   - npm test
 after_script:
-  - COVERAGE_FILE=./test/coverage/lcov.info ./cc-test-reporter after-build --exit-code $?
+  - ./cc-test-reporter format-coverage -t lcov ./test/coverage/lcov.info
+  - ./cc-test-reporter upload-coverage
