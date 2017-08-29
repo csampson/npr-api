@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis-ci.org/openpublicradio/api.svg?branch=master)](https://travis-ci.org/openpublicradio/api)
 [![Code Climate](https://codeclimate.com/github/openpublicradio/api/badges/gpa.svg)](https://codeclimate.com/github/openpublicradio/api)
-[![Test Coverage](https://codeclimate.com/github/openpublicradio/api/badges/coverage.svg)](https://codeclimate.com/github/openpublicradio/api/coverage)
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/bcbe60cee5a787554e39)
 
@@ -31,4 +30,3 @@ Use `npm test` to run the unit tests.
 
 - This requires `NPR_API_KEY` and `GOOGLE_API_KEY` environment variables.
 - Use `npm run db:resync` to re-import station data from the NPR api and location data from Google.
-
