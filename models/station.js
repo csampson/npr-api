@@ -152,6 +152,15 @@ class Station {
         return Promise.reject(new Error(`Failed to fetch stream for station with title: ${title}.`));
       });
   }
+
+  fetchLinks(title) {
+    return this.database.execute('get', `station:${title}.links`)
+      .then(JSON.parse)
+      .catch(error => {
+        logger.error(error);
+        return Promise.reject(new Error(`Failed to fetch links for station with title: ${title}.`));
+      });
+  }
 }
 
 module.exports = Station;

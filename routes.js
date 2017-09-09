@@ -137,6 +137,32 @@ module.exports = [
 
   {
     method: 'GET',
+    path: '/stations/{title}/links',
+    config: {
+      cors: true,
+      validate: {
+        params: {
+          title: Joi.string()
+        }
+      }
+    },
+    handler: (request, reply) => {
+      station.fetchLinks(request.params.title)
+        .then(result => {
+          if (result) {
+            reply(result);
+          } else {
+            reply(Boom.notFound('Station links record not found'));
+          }
+        })
+        .catch((err) => {
+          reply(Boom.wrap(err, 500));
+        });
+    }
+  },
+
+  {
+    method: 'GET',
     path: '/stations/{title}/stream',
     config: {
       cors: true,
