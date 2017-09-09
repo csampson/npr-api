@@ -16,6 +16,16 @@ const sortBy = require('lodash/sortBy');
 
 const Database = require('../lib/database');
 
+function sortKeys(object) {
+  const sortedObject = {};
+
+  Object.keys(object)
+    .sort()
+    .forEach((attr) => { sortedObject[attr] = object[attr]; });
+
+  return sortedObject;
+}
+
 function importStation(station) {
   const content = fs.readFileSync(`${__dirname}/${station}`);
   return JSON.parse(content.toString('utf8'));
@@ -32,14 +42,18 @@ database.client.on('error', (err) => {
 let operations = sortBy(stations, 'title').map((station, index) => {
   const key = `station:${station.title}`;
   const { longitude, latitude } = station.geolocation;
+  const links = station.urls;
   const commands = [];
 
   /** @todo Clean up static station data */
+  station.address = station.address.join(' ');
   station.coordinates = [station.geolocation.latitude, station.geolocation.longitude];
   delete station.geolocation;
+  delete station.urls;
 
   commands.push(
-      ['set', key, JSON.stringify(station)],
+      ['set', key, JSON.stringify(sortKeys(station))],
+      ['set', `${key}.links`, JSON.stringify(links)],
       ['zadd', `station.band:${station.band.toLowerCase()}`, index, key],
       ['zadd', `station.call:${station.call.toLowerCase()}`, index, key],
       ['zadd', `station.format:${station.format}`, index, key],
@@ -52,8 +66,8 @@ let operations = sortBy(stations, 'title').map((station, index) => {
     commands.push(['geoadd', 'station.geolocation', longitude, latitude, key]);
   }
 
-  if (station.urls.streams.length) {
-    const streamURL = station.urls.streams.find(url => (
+  if (links.streams.length) {
+    const streamURL = links.streams.find(url => (
       url.rel === 'primary_format_stream')
     );
 
