@@ -6,25 +6,25 @@
  * @requires logger
  */
 
-'use strict';
+'use strict'
 
-const axios = require('axios');
-const snakeCase = require('lodash/snakeCase');
+const axios = require('axios')
+const snakeCase = require('lodash/snakeCase')
 
-const logger = require('../lib/logger');
+const logger = require('../lib/logger')
 
 /**
  * Page result/size limit
  * @type {number}
  */
-const LIMIT = 20;
+const LIMIT = 20
 
 class Station {
   /**
    * @param {Database} database A database client instance
    */
-  constructor(database) {
-    this.database = database;
+  constructor (database) {
+    this.database = database
   }
 
   /**
@@ -32,13 +32,13 @@ class Station {
    * @param   {string} title - Station's `title` (e.g. 'WWNO-FM')
    * @returns {Promise} Fetch operation
    */
-  fetch(title) {
+  fetch (title) {
     return this.database.execute('get', `station:${title}`)
       .then(JSON.parse)
       .catch(error => {
-        logger.error(error);
-        return Promise.reject(new Error(`Failed to fetch station with title: ${title}.`));
-      });
+        logger.error(error)
+        return Promise.reject(new Error(`Failed to fetch station with title: ${title}.`))
+      })
   }
 
   /**
@@ -50,12 +50,12 @@ class Station {
    * @param   {string} options.sortBy  - Station attribute to sort by
    * @returns {Promise} List operation
    */
-  async list(options = {}) {
-    options = Object.assign({ filter: null, geoNear: null, page: 1, sortBy: 'title' }, options);
+  async list (options = {}) {
+    options = Object.assign({ filter: null, geoNear: null, page: 1, sortBy: 'title' }, options)
 
-    const offset = (options.page > 1) ? ((options.page - 1) * LIMIT) : 0;
-    const lookupKeys = [];
-    let resultKey = 'station';
+    const offset = (options.page > 1) ? ((options.page - 1) * LIMIT) : 0
+    const lookupKeys = []
+    let resultKey = 'station'
 
     if (options.filter && options.filter.size) {
       resultKey += `.filter.${
@@ -63,42 +63,42 @@ class Station {
           .sort()
           .map(([attr, value]) => `${attr}:${snakeCase(value).toLowerCase()}`)
           .join('.')
-      }`;
+      }`
     }
 
     if (options.geoNear) {
-      const [latitude, longitude] = options.geoNear.coordinates;
-      const distance = options.geoNear.distance || 50;
-      resultKey += `.geoNear.coordinates:${longitude},${latitude};distance:${distance}`;
+      const [latitude, longitude] = options.geoNear.coordinates
+      const distance = options.geoNear.distance || 50
+      resultKey += `.geoNear.coordinates:${longitude},${latitude};distance:${distance}`
     }
 
     if (!options.filter && !options.geoNear) {
-      resultKey = `station.${options.sortBy}`;
+      resultKey = `station.${options.sortBy}`
     }
 
     // Apply geolocation searching
     /** @todo use `EXPIRE` command */
     if (options.geoNear) {
-      const [latitude, longitude] = options.geoNear.coordinates;
-      const distance = options.geoNear.distance || 50;
-      const geoSetKey = `station.geoNear.coordinates:${latitude},${longitude};distance:${distance}`;
+      const [latitude, longitude] = options.geoNear.coordinates
+      const distance = options.geoNear.distance || 50
+      const geoSetKey = `station.geoNear.coordinates:${latitude},${longitude};distance:${distance}`
 
-      await this.database.execute('georadius', 'station.geolocation', longitude, latitude, distance, 'mi', 'store', geoSetKey);
-      lookupKeys.push({ name: geoSetKey, weight: 1 });
+      await this.database.execute('georadius', 'station.geolocation', longitude, latitude, distance, 'mi', 'store', geoSetKey)
+      lookupKeys.push({ name: geoSetKey, weight: 1 })
     }
 
     // Apply filtering
     if (options.filter) {
       options.filter.forEach((value, attr) => {
-        lookupKeys.push({ name: `station.${attr}:${snakeCase(value).toLowerCase()}`, weight: 1 });
-      });
+        lookupKeys.push({ name: `station.${attr}:${snakeCase(value).toLowerCase()}`, weight: 1 })
+      })
     }
 
     // Apply sorting
     if (options.sortBy) {
-      lookupKeys.push({ name: `station.${options.sortBy}`, weight: 2 });
+      lookupKeys.push({ name: `station.${options.sortBy}`, weight: 2 })
     } else {
-      lookupKeys.push({ name: 'station.title', weight: 2 });
+      lookupKeys.push({ name: 'station.title', weight: 2 })
     }
 
     /** @todo `EXPIRE` the zinterstore-created key */
@@ -107,7 +107,7 @@ class Station {
       ['zinterstore', resultKey, lookupKeys.length, ...lookupKeys.map(k => k.name), 'weights', ...lookupKeys.map(k => k.weight)],
       // Paginate by obtaining a subset of matching keys
       ['zrange', resultKey, offset, (offset + LIMIT) - 1]
-    ]);
+    ])
 
     return this.database.execute('mget', keys)
       .then((results) => ({
@@ -116,9 +116,9 @@ class Station {
         pageCount: Math.ceil(count / LIMIT)
       }))
       .catch((error) => {
-        logger.error(error);
-        return Promise.reject(new Error(`Failed to fetch stations using options ${JSON.stringify(options)}.`));
-      });
+        logger.error(error)
+        return Promise.reject(new Error(`Failed to fetch stations using options ${JSON.stringify(options)}.`))
+      })
   }
 
   /**
@@ -126,41 +126,41 @@ class Station {
    * @param   {Object} title - Title of the radio station to find
    * @returns {Promise} Fetch operation
    */
-  fetchStream(title) {
+  fetchStream (title) {
     return this.database.execute('get', `station:${title}.primary_format_stream`)
       .then(streamURL => {
         if (streamURL === null) {
-          return Promise.reject(new Error(`Station stream for ${title} not found`));
+          return Promise.reject(new Error(`Station stream for ${title} not found`))
         }
 
         // If already an actual media resource (not a playlist), use that
         if (!/.pls$|.m3u$/.test(streamURL)) {
-          return Promise.resolve(streamURL);
+          return Promise.resolve(streamURL)
         }
 
         // Grab the media resource using the playlist url
         return axios.get(streamURL).then(response => {
-          const content = response.data.split('\n');
-          const fileURL = content.find(line => /^File1=/.test(line));
+          const content = response.data.split('\n')
+          const fileURL = content.find(line => /^File1=/.test(line))
 
           // Get the INI value
-          return fileURL.replace(/^File1=/, '');
-        });
+          return fileURL.replace(/^File1=/, '')
+        })
       })
       .catch(error => {
-        logger.error(error);
-        return Promise.reject(new Error(`Failed to fetch stream for station with title: ${title}.`));
-      });
+        logger.error(error)
+        return Promise.reject(new Error(`Failed to fetch stream for station with title: ${title}.`))
+      })
   }
 
-  fetchLinks(title) {
+  fetchLinks (title) {
     return this.database.execute('get', `station:${title}.links`)
       .then(JSON.parse)
       .catch(error => {
-        logger.error(error);
-        return Promise.reject(new Error(`Failed to fetch links for station with title: ${title}.`));
-      });
+        logger.error(error)
+        return Promise.reject(new Error(`Failed to fetch links for station with title: ${title}.`))
+      })
   }
 }
 
-module.exports = Station;
+module.exports = Station

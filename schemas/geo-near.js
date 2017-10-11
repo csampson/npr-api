@@ -4,13 +4,13 @@
  * @requires joi
  */
 
-'use strict';
+'use strict'
 
-const Joi = require('joi');
+const Joi = require('joi')
 
 const geoNear = Joi.object().keys({
   coordinates: Joi.array().items(Joi.number()),
   distance: Joi.number()
-});
+})
 
-module.exports = geoNear;
+module.exports = geoNear
