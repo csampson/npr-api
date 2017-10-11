@@ -4,9 +4,9 @@
  * @requires joi
  */
 
-'use strict';
+'use strict'
 
-const Joi = require('joi');
+const Joi = require('joi')
 
 const filter = Joi.object().keys({
   band: Joi.string(),
@@ -17,6 +17,6 @@ const filter = Joi.object().keys({
   market_state: Joi.string(),
   name: Joi.string(),
   title: Joi.string()
-});
+})
 
-module.exports = filter;
+module.exports = filter

@@ -10,34 +10,34 @@
  * @requires  routes
  */
 
-'use strict';
+'use strict'
 
 /**
  * Hooks Opbeat monitoring up from this point forward
  * @see {@link https://opbeat.com/docs/articles/nodejs-agent-api/}
  */
 if (process.env.NODE_ENV === 'production') {
-  require('newrelic');
+  require('newrelic')
 }
 
-const Hapi   = require('hapi');
-const HapiQS = require('hapi-qs');
-const logger = require('./lib/logger');
-const routes = require('./routes');
+const Hapi = require('hapi')
+const HapiQS = require('hapi-qs')
+const logger = require('./lib/logger')
+const routes = require('./routes')
 
-const server     = new Hapi.Server();
-const connection = { port: process.env.PORT || 3000 };
+const server = new Hapi.Server()
+const connection = { port: process.env.PORT || 3000 }
 
-function init(err) {
+function init (err) {
   if (err) {
-    logger.fatal(err);
-    throw new Error(err);
+    logger.fatal(err)
+    throw new Error(err)
   }
 
-  logger.info(`Server running at: ${server.info.uri}`);
+  logger.info(`Server running at: ${server.info.uri}`)
 }
 
-server.connection(connection);
-server.register(HapiQS);
-server.route(routes);
-server.start(init);
+server.connection(connection)
+server.register(HapiQS)
+server.route(routes)
+server.start(init)
