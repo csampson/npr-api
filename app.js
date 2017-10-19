@@ -2,12 +2,6 @@
 
 /**
  * @overview  Application entry-point
- * @module    app
- * @requires  hapi
- * @requires  hapi-qs
- * @requires  logger
- * @requires  opbeat
- * @requires  routes
  */
 
 'use strict'

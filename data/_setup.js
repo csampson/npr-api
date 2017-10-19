@@ -2,10 +2,6 @@
 
 /**
  * @overview Sets up application database for local dev
- * @requires database
- * @requires fs
- * @requires lodash/snakeCase
- * @requires lodash/sortBy
  */
 
 'use strict'

@@ -2,11 +2,6 @@
 
 /**
  * @overview  Imports station objects from the NPR API v2
- * @module    import-npr-stations
- * @requires  axios
- * @requires  fs
- * @requires  lodash/snakeCase
- * @requires  path
  */
 
 'use strict'

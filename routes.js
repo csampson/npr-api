@@ -1,10 +1,5 @@
 /**
  * @overview Hapi route configurations
- * @module   routes
- * @requires boom
- * @requires joi
- * @requires lodash/toPairs
- * @requires station
  */
 
 'use strict'
@@ -26,161 +21,163 @@ const schemas = {
 const database = new Database()
 const station = new Station(database)
 
-/** @todo  Strip `Error#message` from error responses */
-module.exports = [
-  {
-    method: 'GET',
-    path: '/health',
-    handler: (request, reply) => {
-      reply()
-    }
-  },
-  {
-    method: 'GET',
-    path: `/${process.env.LOADER_TOKEN}/`,
-    handler: (request, reply) => {
-      reply(process.env.LOADER_TOKEN)
-    }
-  },
-  {
-    method: 'GET',
-    path: '/stations',
-    config: {
-      cors: true,
-      validate: {
-        query: {
-          filter: schemas.filter,
-          geoNear: schemas.geoNear,
-          sort: Joi.string(),
-          page: Joi.number()
-        }
-      }
-    },
-    handler: (request, reply) => {
-      const filter = request.query.filter ? new Map(toPairs(request.query.filter)) : null
-      const geoNear = request.query.geoNear || null
-      const options = { filter, geoNear }
+const routes = []
 
-      if (request.query.page) {
-        options.page = request.query.page
-      }
-
-      if (request.query.sort) {
-        options.sortBy = request.query.sort
-      }
-
-      /** @todo Document what's happening here */
-      station.list(options)
-        .then(results => {
-          const links = {}
-          const prevPage = (results.currentPage - 1) || null
-          const nextPage = (results.currentPage + 1) === results.pageCount ? null : results.currentPage + 1
-          const lastPage = results.pageCount
-          const endpoint = `${request.server.info.protocol}://${request.info.host}${request.path}`
-          const response = reply(results.stations)
-
-          if (nextPage) {
-            links.next = {
-              rel: 'next',
-              url: `${endpoint}?page=${nextPage}`
-            }
-
-            links.last = {
-              rel: 'last',
-              url: `${endpoint}?page=${lastPage}`
-            }
-          }
-
-          if (prevPage) {
-            links.prev = {
-              rel: 'prev',
-              url: `${endpoint}?page=${prevPage}`
-            }
-          }
-
-          if (Object.keys(links).length) {
-            response.header('Link', formatLinkHeader(links))
-          }
-        })
-        .catch(err => {
-          reply(Boom.wrap(err, 500))
-        })
-    }
-  },
-
-  {
-    method: 'GET',
-    path: '/stations/{title}',
-    config: {
-      cors: true,
-      validate: {
-        params: {
-          title: Joi.string()
-        }
-      }
-    },
-    handler: (request, reply) => {
-      /** @todo Document what's happening here */
-      station.fetch(request.params.title)
-        .then(result => {
-          if (result) {
-            reply(result)
-          } else {
-            reply(Boom.notFound('Station record not found'))
-          }
-        })
-        .catch((err) => {
-          reply(Boom.wrap(err, 500))
-        })
-    }
-  },
-
-  {
-    method: 'GET',
-    path: '/stations/{title}/links',
-    config: {
-      cors: true,
-      validate: {
-        params: {
-          title: Joi.string()
-        }
-      }
-    },
-    handler: (request, reply) => {
-      station.fetchLinks(request.params.title)
-        .then(result => {
-          if (result) {
-            reply(result)
-          } else {
-            reply(Boom.notFound('Station links record not found'))
-          }
-        })
-        .catch((err) => {
-          reply(Boom.wrap(err, 500))
-        })
-    }
-  },
-
-  {
-    method: 'GET',
-    path: '/stations/{title}/stream',
-    config: {
-      cors: true,
-      validate: {
-        params: {
-          title: Joi.string()
-        }
-      }
-    },
-    handler: (request, reply) => (
-      station.fetchStream(request.params.title)
-        .then(streamURL => {
-          const response = reply(streamURL)
-          response.type('text/plain')
-        })
-        .catch(err => {
-          reply(Boom.wrap(err, 500))
-        })
-    )
+// loader.io token
+routes.push({
+  method: 'GET',
+  path: `/${process.env.LOADER_TOKEN}/`,
+  handler: (request, reply) => {
+    reply(process.env.LOADER_TOKEN)
   }
-]
+})
+
+routes.push({
+  method: 'GET',
+  path: '/health',
+  handler: (request, reply) => {
+    reply()
+  }
+})
+
+routes.push({
+  method: 'GET',
+  path: '/stations',
+  config: {
+    cors: true,
+    validate: {
+      query: {
+        filter: schemas.filter,
+        geoNear: schemas.geoNear,
+        sort: Joi.string(),
+        page: Joi.number()
+      }
+    }
+  },
+  handler: (request, reply) => {
+    const filter = request.query.filter ? new Map(toPairs(request.query.filter)) : null
+    const geoNear = request.query.geoNear || null
+    const options = { filter, geoNear }
+
+    if (request.query.page) {
+      options.page = request.query.page
+    }
+
+    if (request.query.sort) {
+      options.sortBy = request.query.sort
+    }
+
+    /** @todo Document what's happening here */
+    station.list(options)
+      .then(results => {
+        const links = {}
+        const prevPage = (results.currentPage - 1) || null
+        const nextPage = (results.currentPage + 1) === results.pageCount ? null : results.currentPage + 1
+        const lastPage = results.pageCount
+        const endpoint = `${request.server.info.protocol}://${request.info.host}${request.path}`
+        const response = reply(results.stations)
+
+        if (nextPage) {
+          links.next = {
+            rel: 'next',
+            url: `${endpoint}?page=${nextPage}`
+          }
+
+          links.last = {
+            rel: 'last',
+            url: `${endpoint}?page=${lastPage}`
+          }
+        }
+
+        if (prevPage) {
+          links.prev = {
+            rel: 'prev',
+            url: `${endpoint}?page=${prevPage}`
+          }
+        }
+
+        if (Object.keys(links).length) {
+          response.header('Link', formatLinkHeader(links))
+        }
+      })
+      .catch(err => {
+        reply(Boom.wrap(err, 500))
+      })
+  }
+})
+
+routes.push({
+  method: 'GET',
+  path: '/stations/{title}',
+  config: {
+    cors: true,
+    validate: {
+      params: {
+        title: Joi.string()
+      }
+    }
+  },
+  handler: (request, reply) => {
+    /** @todo Document what's happening here */
+    station.fetch(request.params.title)
+      .then(result => {
+        if (result) {
+          reply(result)
+        } else {
+          reply(Boom.notFound('Station record not found'))
+        }
+      })
+      .catch((err) => {
+        reply(Boom.wrap(err, 500))
+      })
+  }
+})
+
+routes.push({
+  method: 'GET',
+  path: '/stations/{title}/links',
+  config: {
+    cors: true,
+    validate: {
+      params: {
+        title: Joi.string()
+      }
+    }
+  },
+  handler: (request, reply) => {
+    station.fetchLinks(request.params.title)
+      .then(result => {
+        if (result) {
+          reply(result)
+        } else {
+          reply(Boom.notFound('Station links record not found'))
+        }
+      })
+      .catch((err) => {
+        reply(Boom.wrap(err, 500))
+      })
+  }
+})
+
+routes.push({
+  method: 'GET',
+  path: '/stations/{title}/stream',
+  config: {
+    cors: true,
+    validate: {
+      params: {
+        title: Joi.string()
+      }
+    }
+  },
+  handler: (request, reply) => (
+    station.fetchStream(request.params.title)
+      .then(streamURL => {
+        const response = reply(streamURL)
+        response.type('text/plain')
+      })
+      .catch(err => {
+        reply(Boom.wrap(err, 500))
+      })
+  )
+})
