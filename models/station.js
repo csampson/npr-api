@@ -1,9 +1,5 @@
 /**
  * @overview Stations table interface
- * @module   station
- * @requires axios
- * @requires lodash/snakeCase
- * @requires logger
  */
 
 'use strict'

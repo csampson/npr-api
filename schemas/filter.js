@@ -1,7 +1,5 @@
 /**
  * @overview API `filter` object schema
- * @module   filter
- * @requires joi
  */
 
 'use strict'

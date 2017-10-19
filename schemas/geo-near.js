@@ -1,7 +1,5 @@
 /**
  * @overview API `geoNear` object schema
- * @module   geo-near
- * @requires joi
  */
 
 'use strict'
