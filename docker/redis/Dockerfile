@@ -1,7 +1,6 @@
-FROM alpine:3.6
+FROM redislabs/redisearch:1.0.8
 
-RUN apk add --no-cache redis=3.2.8-r0
 COPY redis.conf /etc/redis.conf
 VOLUME ["/var/run/redis"]
 
-CMD redis-server /etc/redis.conf
+CMD redis-server /etc/redis.conf --loadmodule /usr/lib/redis/modules/redisearch.so

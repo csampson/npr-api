@@ -5,15 +5,12 @@
 'use strict'
 
 const axios = require('axios')
-const snakeCase = require('lodash/snakeCase')
-
 const logger = require('../lib/logger')
 
 /**
  * Page result/size limit
  * @type {number}
  */
-const LIMIT = 20
 
 class Station {
   /**
@@ -24,96 +21,42 @@ class Station {
   }
 
   /**
-   * Retrieve a single station record
-   * @param   {string} title - Station's `title` (e.g. 'WWNO-FM')
-   * @returns {Promise} Fetch operation
+   * Fetch a list of radio stations matching a query
+   * @param   {Object} [filter={}] - Hashmap of search filtering options
+   * @param   {string} [filter.query] - RediSearch query
+   * @see     {@link http://redisearch.io/Query_Syntax}
+   * @returns {Set} List of matching radio station records
    */
-  fetch (title) {
-    return this.database.execute('get', `station:${title}`)
-      .then(JSON.parse)
-      .catch(error => {
-        logger.error(error)
-        return Promise.reject(new Error(`Failed to fetch station with title: ${title}.`))
+  search (filter = {}) {
+    return this.database.execute('FT.SEARCH', ['stations', filter.query || 'stations'])
+      .then((results) => {
+        const stations = new Set()
+
+        // Results start at index:1; first item is the total count
+        results.slice(1, results.length).forEach((result) => {
+          if (typeof result === 'string') {
+            return
+          }
+
+          const station = result.reduce((prev, curr, index, collection) => {
+            if (index % 2 === 0) {
+              const value = collection[index + 1]
+              prev[curr] = curr === 'urls'
+                ? JSON.parse(value)
+                : value
+            }
+
+            return prev
+          }, {})
+
+          stations.add(station)
+        })
+
+        return stations
       })
-  }
-
-  /**
-   * Gets a list of all radio stations
-   * @param   {Object} options         - Hashmap of fetch options
-   * @param   {Map}    options.filter  - Filtering options
-   * @param   {Object} options.geoNear - Geolocation search options
-   * @param   {number} options.page    - Page number of stations to fetch
-   * @param   {string} options.sortBy  - Station attribute to sort by
-   * @returns {Promise} List operation
-   */
-  async list (options = {}) {
-    options = Object.assign({ filter: null, geoNear: null, page: 1, sortBy: 'title' }, options)
-
-    const offset = (options.page > 1) ? ((options.page - 1) * LIMIT) : 0
-    const lookupKeys = []
-    let resultKey = 'station'
-
-    if (options.filter && options.filter.size) {
-      resultKey += `.filter.${
-        [...options.filter.entries()]
-          .sort()
-          .map(([attr, value]) => `${attr}:${snakeCase(value).toLowerCase()}`)
-          .join('.')
-      }`
-    }
-
-    if (options.geoNear) {
-      const [latitude, longitude] = options.geoNear.coordinates
-      const distance = options.geoNear.distance || 50
-      resultKey += `.geoNear.coordinates:${longitude},${latitude};distance:${distance}`
-    }
-
-    if (!options.filter && !options.geoNear) {
-      resultKey = `station.${options.sortBy}`
-    }
-
-    // Apply geolocation searching
-    /** @todo use `EXPIRE` command */
-    if (options.geoNear) {
-      const [latitude, longitude] = options.geoNear.coordinates
-      const distance = options.geoNear.distance || 50
-      const geoSetKey = `station.geoNear.coordinates:${latitude},${longitude};distance:${distance}`
-
-      await this.database.execute('georadius', 'station.geolocation', longitude, latitude, distance, 'mi', 'store', geoSetKey)
-      lookupKeys.push({ name: geoSetKey, weight: 1 })
-    }
-
-    // Apply filtering
-    if (options.filter) {
-      options.filter.forEach((value, attr) => {
-        lookupKeys.push({ name: `station.${attr}:${snakeCase(value).toLowerCase()}`, weight: 1 })
-      })
-    }
-
-    // Apply sorting
-    if (options.sortBy) {
-      lookupKeys.push({ name: `station.${options.sortBy}`, weight: 2 })
-    } else {
-      lookupKeys.push({ name: 'station.title', weight: 2 })
-    }
-
-    /** @todo `EXPIRE` the zinterstore-created key */
-    const [count, keys] = await this.database.execute('multi', [
-      // Create a page for this filter set
-      ['zinterstore', resultKey, lookupKeys.length, ...lookupKeys.map(k => k.name), 'weights', ...lookupKeys.map(k => k.weight)],
-      // Paginate by obtaining a subset of matching keys
-      ['zrange', resultKey, offset, (offset + LIMIT) - 1]
-    ])
-
-    return this.database.execute('mget', keys)
-      .then((results) => ({
-        currentPage: options.page,
-        stations: results.map(JSON.parse),
-        pageCount: Math.ceil(count / LIMIT)
-      }))
       .catch((error) => {
         logger.error(error)
-        return Promise.reject(new Error(`Failed to fetch stations using options ${JSON.stringify(options)}.`))
+        return Promise.reject(new Error(`Something went wrong while trying to fetch stations matching your search.`))
       })
   }
 

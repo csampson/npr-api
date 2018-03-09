@@ -7,19 +7,22 @@
   },
   "engine-strict": true,
   "scripts": {
-    "start": "npm run db:load && node ./app",
+    "start": "npm run data:load && node ./app",
     "test": "standard && nyc mocha -R landing ./test/spec-helper.js ./{lib,models}/**/*.spec.js",
-    "db:resync": "node ./scripts/import-npr-stations",
-    "db:load": "node ./data/_setup"
+    "data:pull": "node ./scripts/import-stations",
+    "data:load": "node ./scripts/load-stations"
   },
   "dependencies": {
+    "apollo-server-koa": "^1.3.2",
     "axios": "^0.16.2",
     "boom": "^5.2.0",
     "bunyan": "^1.8.12",
-    "format-link-header": "^2.0.0",
-    "hapi": "^16.5.2",
-    "hapi-qs": "^1.1.3",
-    "joi": "^10.6.0",
+    "graphql": "^0.13.1",
+    "graphql-tools": "^2.21.0",
+    "koa": "^2.5.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-bunyan-logger": "^2.0.0",
+    "koa-router": "^7.4.0",
     "lodash": "^4.17.4",
     "newrelic": "^2.1.0",
     "redis": "^2.8.0"

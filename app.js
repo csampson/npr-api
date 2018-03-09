@@ -1,37 +1,25 @@
-/* eslint "global-require": "off" */
-
-/**
- * @overview  Application entry-point
- */
-
 'use strict'
 
-/**
- * Hooks Opbeat monitoring up from this point forward
- * @see {@link https://opbeat.com/docs/articles/nodejs-agent-api/}
- */
-if (process.env.NODE_ENV === 'production') {
-  require('newrelic')
-}
+const Koa = require('koa')
+const KoaRouter = require('koa-router')
+const koaLogger = require('koa-bunyan-logger')
+const koaBody = require('koa-bodyparser')
+const { graphqlKoa, graphiqlKoa } = require('apollo-server-koa')
 
-const Hapi = require('hapi')
-const HapiQS = require('hapi-qs')
-const logger = require('./lib/logger')
-const routes = require('./routes')
+const schema = require('./graphql/schema')
 
-const server = new Hapi.Server()
-const connection = { port: process.env.PORT || 3000 }
+const app = new Koa()
+const router = new KoaRouter()
+const PORT = 3000
 
-function init (err) {
-  if (err) {
-    logger.fatal(err)
-    throw new Error(err)
-  }
+app.use(koaBody())
+app.use(koaLogger())
+app.use(koaLogger.requestIdContext())
+app.use(koaLogger.requestLogger())
 
-  logger.info(`Server running at: ${server.info.uri}`)
-}
+router.post('/graphql', graphqlKoa({ schema }))
+router.get('/graphiql', graphiqlKoa({ endpointURL: '/graphql' }))
 
-server.connection(connection)
-server.register(HapiQS)
-server.route(routes)
-server.start(init)
+app.use(router.routes())
+app.use(router.allowedMethods())
+app.listen(PORT)
