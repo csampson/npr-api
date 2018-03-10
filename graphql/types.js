@@ -23,7 +23,7 @@ module.exports = `
     id: String!
     address: String,
     band: String!,
-    call: String!,
+    callsign: String!,
     fax: String,
     frequency: Float!,
     logo: String,

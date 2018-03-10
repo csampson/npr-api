@@ -12,6 +12,24 @@ const sortBy = require('lodash/sortBy')
 
 const Database = require('../lib/database')
 
+const attrs = [
+  'address',
+  'band',
+  'callsign',
+  'fax',
+  'frequency',
+  'geolocation',
+  'id',
+  'logo',
+  'market_city',
+  'market_state',
+  'name',
+  'phone',
+  'phone_extension',
+  'tagline',
+  'urls'
+]
+
 function importStation (station) {
   const content = fs.readFileSync(`${__dirname}/../data/${station}`)
   return JSON.parse(content.toString('utf8'))
@@ -37,23 +55,6 @@ function createIndex () {
 function loadStation (station) {
   const fields = []
 
-  const attrs = [
-    'address',
-    'band',
-    'call',
-    'fax',
-    'frequency',
-    'geolocation',
-    'logo',
-    'market_city',
-    'market_state',
-    'name',
-    'phone',
-    'phone_extension',
-    'tagline',
-    'urls'
-  ]
-
   // Prune nil values
   attrs.forEach((attr) => {
     if (station[attr] !== null && station[attr] !== undefined) {
@@ -67,10 +68,8 @@ function loadStation (station) {
     }
   })
 
-  fields.push('id', station.title)
-
   return database.execute('FT.ADD', [
-    'stations', station.title, 1, 'FIELDS'
+    'stations', station.id, 1, 'FIELDS'
   ].concat(fields))
 }
 
@@ -85,16 +84,7 @@ database.client.on('error', (err) => {
 console.log('Loading station records...')
 
 createIndex().then(() => {
-  const operations = sortBy(stations, 'title').map((station, index) => {
-    /** @todo Clean up static station data */
-    station.address = station.address.join(' ')
-
-    if (station.geolocation.longitude !== undefined && station.geolocation.latitude !== undefined) {
-      station.geolocation = `${station.geolocation.longitude},${station.geolocation.latitude}`
-    } else {
-      delete station.geolocation
-    }
-
+  const operations = sortBy(stations, 'id').map((station, index) => {
     return loadStation(station)
   })
 

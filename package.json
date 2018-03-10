@@ -9,7 +9,7 @@
   "scripts": {
     "start": "npm run data:load && node ./app",
     "test": "standard && jest",
-    "data:pull": "node ./scripts/import-stations",
+    "data:pull": "node ./scripts/pull-stations",
     "data:load": "node ./scripts/load-stations"
   },
   "dependencies": {

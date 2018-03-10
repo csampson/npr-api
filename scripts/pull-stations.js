@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 /**
- * @overview  Imports station objects from the NPR API v2
+ * @overview Imports station objects from the NPR API v2
  */
 
 'use strict'
@@ -9,7 +9,7 @@
 const axios = require('axios')
 const fs = require('fs')
 const path = require('path')
-const snakeCase = require('lodash').snakeCase
+const snakeCase = require('lodash/snakeCase')
 
 const NPR_API_KEY = process.env.NPR_API_KEY
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
@@ -117,13 +117,13 @@ function deserializeStations (stations) {
     console.log(`Deserializing ${station.title}`)
 
     return {
-      abbreviation: station.abbreviation,
-      address: station.address,
+      address: station.address.join(' '),
       band: station.band,
-      call: station.call,
+      callsign: station.call,
       fax: toNumber(station.fax),
       format: snakeCase(station.format),
       frequency: toNumber(station.frequency),
+      id: station.title,
       logo: station.logo,
       market_city: station.market_city,
       market_state: station.market_state,
@@ -131,23 +131,27 @@ function deserializeStations (stations) {
       phone: toNumber(station.phone),
       phone_extension: toNumber(station.phone_extension),
       tagline: station.tagline,
-      title: station.title,
       urls: getUrls(station)
     }
   })
 }
 
 function fetchGeolocation (station) {
-  const address = station.address.join('+')
+  // Google expects + as the delmiter
+  const address = station.address.replace(' ', '+')
 
   console.log(`Fetching geolocation for ${station.name}: ${address}`)
 
   return axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${GOOGLE_API_KEY}`).then(response => {
-    const geometry = response.data.results[0] ? response.data.results[0].geometry : { location: {} }
+    const results = response.data.results[0]
 
-    return Object.assign(station, {
-      geolocation: { longitude: geometry.location.lng, latitude: geometry.location.lat }
-    })
+    if (results) {
+      return Object.assign(station, {
+        geolocation: `${results.geometry.location.lng},${results.geometry.location.lat}`
+      })
+    }
+
+    return station
   }).catch(raise)
 }
 
