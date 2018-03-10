@@ -194,6 +194,34 @@
         "graphql-extensions": "0.0.8"
       }
     },
+    "apollo-engine": {
+      "version": "1.0.1",
+      "resolved": "https://registry.npmjs.org/apollo-engine/-/apollo-engine-1.0.1.tgz",
+      "integrity": "sha512-fCc9jDaMM8nEj4Hz7bLNvsSeq+dTPtzvfRaBcul7m7/8wicnRkwbXW7ShZp427IcOmw+ZcANzDtEWZAtpTevFw==",
+      "requires": {
+        "apollo-engine-binary-darwin": "0.2018.2-111-gb13195fb0",
+        "apollo-engine-binary-linux": "0.2018.2-111-gb13195fb0",
+        "apollo-engine-binary-windows": "0.2018.2-111-gb13195fb0"
+      }
+    },
+    "apollo-engine-binary-darwin": {
+      "version": "0.2018.2-111-gb13195fb0",
+      "resolved": "https://registry.npmjs.org/apollo-engine-binary-darwin/-/apollo-engine-binary-darwin-0.2018.2-111-gb13195fb0.tgz",
+      "integrity": "sha512-+YdzkPMfGCT2DbMREENZwVveFJamlE2ugZqzn8P0ClIvAnuxMKOpLzV7VMOsIwkWOUB/jW6o43dVJzS51giy+Q==",
+      "optional": true
+    },
+    "apollo-engine-binary-linux": {
+      "version": "0.2018.2-111-gb13195fb0",
+      "resolved": "https://registry.npmjs.org/apollo-engine-binary-linux/-/apollo-engine-binary-linux-0.2018.2-111-gb13195fb0.tgz",
+      "integrity": "sha512-F3sxnewCgELrXKajmXWZd/HjFHHXdxfuttraHjB6fir3B4ypUZ2HaiUjfC+d4yPp7wH5dJRMN5n/F6fwIXqQAQ==",
+      "optional": true
+    },
+    "apollo-engine-binary-windows": {
+      "version": "0.2018.2-111-gb13195fb0",
+      "resolved": "https://registry.npmjs.org/apollo-engine-binary-windows/-/apollo-engine-binary-windows-0.2018.2-111-gb13195fb0.tgz",
+      "integrity": "sha512-74GqsagaPdVRtugTd1LrnPFvrzaWmV5eoYlQJue5SWirpOUkSPKenSDiGQJNhFfZgyrHRdigmqTH0mCZEiFKRQ==",
+      "optional": true
+    },
     "apollo-link": {
       "version": "1.2.1",
       "resolved": "https://registry.npmjs.org/apollo-link/-/apollo-link-1.2.1.tgz",
