@@ -4,17 +4,11 @@
 
 'use strict'
 
-const axios = require('axios')
 const logger = require('../lib/logger')
-
-/**
- * Page result/size limit
- * @type {number}
- */
 
 class Station {
   /**
-   * @param {Database} database A database client instance
+   * @param {Database} database - The database client instance
    */
   constructor (database) {
     this.database = database
@@ -38,6 +32,8 @@ class Station {
             return
           }
 
+          // Marshal a station object from an array of Redis keys/values
+          // in the form of [key, value, key, value]
           const station = result.reduce((prev, curr, index, collection) => {
             if (index % 2 === 0) {
               const value = collection[index + 1]
@@ -57,47 +53,6 @@ class Station {
       .catch((error) => {
         logger.error(error)
         return Promise.reject(new Error(`Something went wrong while trying to fetch stations matching your search.`))
-      })
-  }
-
-  /**
-   * Fetches the media stream url for a given radio station
-   * @param   {Object} title - Title of the radio station to find
-   * @returns {Promise} Fetch operation
-   */
-  fetchStream (title) {
-    return this.database.execute('get', `station:${title}.primary_format_stream`)
-      .then(streamURL => {
-        if (streamURL === null) {
-          return Promise.reject(new Error(`Station stream for ${title} not found`))
-        }
-
-        // If already an actual media resource (not a playlist), use that
-        if (!/.pls$|.m3u$/.test(streamURL)) {
-          return Promise.resolve(streamURL)
-        }
-
-        // Grab the media resource using the playlist url
-        return axios.get(streamURL).then(response => {
-          const content = response.data.split('\n')
-          const fileURL = content.find(line => /^File1=/.test(line))
-
-          // Get the INI value
-          return fileURL.replace(/^File1=/, '')
-        })
-      })
-      .catch(error => {
-        logger.error(error)
-        return Promise.reject(new Error(`Failed to fetch stream for station with title: ${title}.`))
-      })
-  }
-
-  fetchLinks (title) {
-    return this.database.execute('get', `station:${title}.links`)
-      .then(JSON.parse)
-      .catch(error => {
-        logger.error(error)
-        return Promise.reject(new Error(`Failed to fetch links for station with title: ${title}.`))
       })
   }
 }
