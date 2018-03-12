@@ -22,7 +22,7 @@ class Station {
    * @returns {Set} List of matching radio station records
    */
   search (filter = {}) {
-    return this.database.execute('FT.SEARCH', ['stations', filter.query || 'stations'])
+    return this.database.execute('FT.SEARCH', ['stations', filter.query || 'fm'])
       .then((results) => {
         const stations = new Set()
 
