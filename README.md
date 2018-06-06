@@ -9,9 +9,9 @@ A GraphQL API for querying information about [NPR](http://npr.org) member statio
 
 ## Requirements
 
-- Node.js 8.3.x
-- npm 5.3.x
-- Docker 17.x
+- Node.js 10.x
+- npm 6.x
+- Docker 18.x
 - docker-compose 1.x
 
 ## Installing
