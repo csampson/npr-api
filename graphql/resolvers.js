@@ -9,7 +9,7 @@ const station = new Station(database)
 const resolvers = {
   Query: {
     stations: (obj, args) => (
-     station.search(args.search)
+      station.search(args.search)
     )
   }
 }

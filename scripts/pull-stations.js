@@ -183,10 +183,10 @@ function saveStations (stations, state) {
 [...STATES].reduce((prev, curr) => (
   prev.then(() => (
     fetchStations(curr)
-    .then(deserializeStations)
-    .then(wait)
-    .then(fetchGeolocations)
-    .then(wait)
-    .then(stations => saveStations(stations, curr))
+      .then(deserializeStations)
+      .then(wait)
+      .then(fetchGeolocations)
+      .then(wait)
+      .then(stations => saveStations(stations, curr))
   )).catch(raise)
 ), Promise.resolve())
