@@ -5,9 +5,6 @@ node_modules
 # Dev tools
 .vscode
 
-# Ops
-newrelic_agent.log
-
 # Testing
 .nyc_output
 test/coverage
