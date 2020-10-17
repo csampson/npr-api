@@ -1,10 +1,10 @@
-FROM node:10.3.0-alpine
+FROM node:14.10.1-alpine
 
 RUN mkdir -p /opt/app
 WORKDIR /opt/app
 
 COPY package.json /opt/app/
-RUN npm install --production
+RUN yarn --production
 COPY . /opt/app
 
 ENV PORT 3000

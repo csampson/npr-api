@@ -1,4 +1,4 @@
-FROM redislabs/redisearch:1.0.8
+FROM redislabs/redisearch:2.0.0
 
 COPY redis.conf /etc/redis.conf
 VOLUME ["/var/run/redis"]
