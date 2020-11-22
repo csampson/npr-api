@@ -7,7 +7,7 @@
   },
   "engine-strict": true,
   "scripts": {
-    "start": "npm run data:load && node ./app",
+    "start": "yarn run data:load && node ./app",
     "test": "standard && jest --coverage",
     "data:pull": "node ./scripts/pull-stations",
     "data:load": "node ./scripts/load-stations"
