@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 /**
  * @overview Loads station data into Redis
  */

@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 /**
  * @overview Imports station objects from the NPR API v2
  */
@@ -80,7 +78,7 @@ function getUrls (station) {
     streams: []
   }
 
-  station.urls.forEach((url, index) => {
+  station.urls.forEach((url) => {
     const type = snakeCase(url.type_name).replace('mp_3', 'mp3')
     const metadata = LINK_METADATA.get(type)
 
