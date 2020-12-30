@@ -1,5 +1,5 @@
 /**
- * @overview Stations table interface
+ * @overview Stations interface
  */
 
 'use strict'
@@ -15,16 +15,15 @@ class Station {
   }
 
   /**
-   * Fetch a list of radio stations matching a query
-   * @param   {Object} [filter={}] - Hashmap of search filtering options
-   * @param   {string} [filter.query] - RediSearch query
-   * @see     {@link http://redisearch.io/Query_Syntax}
-   * @returns {Set} List of matching radio station records
+   * Query redisearch for a set of radio stations
+   * @param {string} [query] - RediSearch query
+   * @see {@link http://redisearch.io/Query_Syntax}
+   * @returns {Array} List of matching radio station records
    */
-  search (filter = {}) {
-    return this.database.execute('FT.SEARCH', ['stations', filter.query || 'fm'])
+  search (query) {
+    return this.database.execute('FT.SEARCH', ['stations', query])
       .then((results) => {
-        const stations = new Set()
+        const stations = []
 
         // Results start at index:1; first item is the total count
         results.slice(1, results.length).forEach((result) => {
@@ -37,6 +36,7 @@ class Station {
           const station = result.reduce((prev, curr, index, collection) => {
             if (index % 2 === 0) {
               const value = collection[index + 1]
+
               prev[curr] = curr === 'urls'
                 ? JSON.parse(value)
                 : value
@@ -45,7 +45,7 @@ class Station {
             return prev
           }, {})
 
-          stations.add(station)
+          stations.push(station)
         })
 
         return stations
