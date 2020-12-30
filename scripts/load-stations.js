@@ -40,7 +40,6 @@ function createIndex () {
     'address', 'TEXT',
     'band', 'TEXT',
     'callsign', 'TEXT',
-    'fax', 'NUMERIC',
     'frequency', 'NUMERIC',
     'geolocation', 'GEO',
     'id', 'TEXT',
