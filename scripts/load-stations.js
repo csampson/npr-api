@@ -29,7 +29,7 @@ const attrs = [
 ]
 
 function importStation (station) {
-  const content = fs.readFileSync(`${__dirname}/../data/${station}`)
+  const content = fs.readFileSync(path.join(__dirname, `../data/${station}`))
   return JSON.parse(content.toString('utf8'))
 }
 
