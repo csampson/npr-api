@@ -52,7 +52,7 @@ class Station {
       })
       .catch((error) => {
         logger.error(error)
-        return Promise.reject(new Error(`Something went wrong while trying to fetch stations matching your search.`))
+        return Promise.reject(new Error('Something went wrong while trying to fetch stations matching your search.'))
       })
   }
 }
