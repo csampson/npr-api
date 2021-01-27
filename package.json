@@ -13,7 +13,7 @@
     "data:load": "node ./scripts/load-stations"
   },
   "dependencies": {
-    "apollo-server-koa": "^1.3.6",
+    "apollo-server-koa": "^2.14.2",
     "axios": "^0.18.0",
     "bunyan": "^1.8.12",
     "graphql": "^0.13.2",
