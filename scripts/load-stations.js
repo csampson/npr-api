@@ -6,7 +6,6 @@
 
 const fs = require('fs')
 const path = require('path')
-const sortBy = require('lodash/sortBy')
 
 const Database = require('../lib/database')
 
@@ -28,46 +27,51 @@ const attrs = [
   'urls'
 ]
 
+const indexes = {
+  'band': 'TEXT',
+  'callsign': 'TEXT',
+  'frequency': 'NUMERIC',
+  'geolocation': 'GEO',
+  'id': 'TEXT',
+  'market_city': 'TEXT',
+  'market_state': 'TEXT',
+  'name': 'TEXT'
+}
+
 function importStation (station) {
   const content = fs.readFileSync(path.join(__dirname, `../data/${station}`))
   return JSON.parse(content.toString('utf8'))
 }
 
 function createIndex () {
+  const schema = Object.keys(indexes).reduce((prev, curr) => (
+    prev.concat(curr, indexes[curr])
+  ), [])
+
   return database.execute('FT.CREATE', [
     'stations',
+    'ON',
+    'HASH',
+    'PREFIX',
+    '1',
+    'station:',
     'SCHEMA',
-    'address', 'TEXT',
-    'band', 'TEXT',
-    'callsign', 'TEXT',
-    'frequency', 'NUMERIC',
-    'geolocation', 'GEO',
-    'id', 'TEXT',
-    'market_city', 'TEXT',
-    'market_state', 'TEXT',
-    'name', 'TEXT'
-  ])
+  ].concat(schema))
 }
 
-function loadStation (station) {
-  const fields = []
+function loadStation (station, index) {
+  const args = []
 
-  // Prune nil values
+  // Add non-nil values to HSET args
   attrs.forEach((attr) => {
-    if (station[attr] !== null && station[attr] !== undefined) {
-      const value = attr === 'urls'
-        ? JSON.stringify(station[attr])
-        : station[attr]
-
-      if (value) {
-        fields.push(attr, value)
-      }
+    if (attr in indexes && station[attr] !== null && station[attr] !== undefined) {
+      args.push(attr, station[attr])
     }
   })
 
-  return database.execute('FT.ADD', [
-    'stations', station.id, 1, 'FIELDS'
-  ].concat(fields))
+  return database.execute('HSET', [
+    `station:${index+1}`,
+  ].concat(args, ['json', JSON.stringify(station)]))
 }
 
 const database = new Database()
@@ -81,9 +85,9 @@ database.client.on('error', (err) => {
 console.log('Loading station records...')
 
 createIndex().then(() => {
-  const operations = sortBy(stations, 'id').map((station, index) => {
-    return loadStation(station)
-  })
+  const operations = stations.map((station, index) => (
+    loadStation(station, index)
+  ))
 
   Promise.all(operations)
     .then(() => {

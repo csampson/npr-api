@@ -1,10 +1,8 @@
 'use strict'
 
-module.exports = `
-  input Search {
-    query: String
-  }
+const { gql } = require('apollo-server')
 
+module.exports = gql`
   type URL {
     href: String!
     rel: String
@@ -37,6 +35,6 @@ module.exports = `
   }
 
   type Query {
-    stations(search: Search): [Station]
+    stations(query: String): [Station]
   }
 `

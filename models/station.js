@@ -21,31 +21,22 @@ class Station {
    * @returns {Array} List of matching radio station records
    */
   search (query) {
-    return this.database.execute('FT.SEARCH', ['stations', query])
+    query.replace(/\*/g, '')
+
+    return this.database.execute('FT.SEARCH', ['stations', query + '*'])
       .then((results) => {
         const stations = []
 
         // Results start at index:1; first item is the total count
+        // Subsequent items are hash [key, value]
         results.slice(1, results.length).forEach((result) => {
           if (typeof result === 'string') {
             return
           }
 
-          // Marshal a station object from an array of Redis keys/values
-          // in the form of [key, value, key, value]
-          const station = result.reduce((prev, curr, index, collection) => {
-            if (index % 2 === 0) {
-              const value = collection[index + 1]
+          const station = result[result.indexOf('json') + 1]
 
-              prev[curr] = curr === 'urls'
-                ? JSON.parse(value)
-                : value
-            }
-
-            return prev
-          }, {})
-
-          stations.push(station)
+          stations.push(JSON.parse(station))
         })
 
         return stations
