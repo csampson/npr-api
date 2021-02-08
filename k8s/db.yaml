@@ -1,37 +1,31 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: openpublicradio-db
   labels:
-    app: opr-db
-  name: opr-db
+    app: openpublicradio
 spec:
-  ports:
-    - name: "6379"
-      port: 6379
-      targetPort: 6379
   selector:
-    app: opr-db
+    app: openpublicradio
+  ports:
+  - port: 6379
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: opr-db
-  name: opr-db
+  name: openpublicradio-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: opr-db
+      app: openpublicradio
   template:
     metadata:
       labels:
-        app: opr-db
+        app: openpublicradio
     spec:
       containers:
-        - image: redislabs/redisearch:2.0.4
-          name: opr-db
-          ports:
-            - containerPort: 6379
-      restartPolicy: Always
-status: {}
+      - name: openpublicradio-db
+        image: redislabs/redisearch:2.0.3
+        ports:
+          - containerPort: 6379

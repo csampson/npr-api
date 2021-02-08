@@ -1,14 +1,14 @@
 version: "3.2"
 services:
-  opr-api:
+  openpublicradio-api:
     build:
       context: .
       dockerfile: ./Dockerfile
     depends_on:
-      - opr-db
+      - openpublicradio-db
     ports:
       - "3000:3000"
     volumes:
       - .:/app
-  opr-db:
-    image: redislabs/redisearch:2.0.4
+  openpublicradio-db:
+    image: "redislabs/redisearch:2.0.4"

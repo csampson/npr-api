@@ -9,6 +9,10 @@ COPY yarn.lock /opt/app
 RUN yarn --production
 COPY . /opt/app
 
+ENV REDIS_HOST openpublicradio-db
+ENV REDIS_PORT 6379
+
 ENV PORT 3000
 EXPOSE 3000
-CMD ["npm", "start"]
+
+CMD ["yarn", "start"]

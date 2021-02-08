@@ -1,33 +1,39 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: opr-api
+  name: openpublicradio-api
+  labels:
+    app: openpublicradio
 spec:
+  type: LoadBalancer
   selector:
-    app: opr-api
+    app: openpublicradio
   ports:
     - port: 80
       targetPort: 3000
-  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: opr-api
+  name: openpublicradio-api
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: opr-api
+      app: openpublicradio
   template:
     metadata:
       labels:
-        app: opr-api
+        app: openpublicradio
     spec:
       containers:
-      - name: opr-api
-        image: opr/api
-        imagePullPolicy: Never
+      - name: openpublicradio-api
+        image: openpublicradio/api:0.0.1
+        env:
+        - name: REDIS_HOST
+          value: "openpublicradio-db"
+        - name: REDIS_PORT
+          value: "6379"
         ports:
         - containerPort: 3000
       restartPolicy: Always
