@@ -9,9 +9,7 @@ COPY yarn.lock /opt/app
 RUN yarn --production
 COPY . /opt/app
 
-ENV REDIS_HOST openpublicradio-db
-ENV REDIS_PORT 6379
-
+ENV REDIS_HOST npr-api-redis
 ENV PORT 3000
 EXPOSE 3000
 

@@ -7,10 +7,8 @@
   },
   "engine-strict": true,
   "scripts": {
-    "start": "yarn run data:load && node ./app",
-    "test": "standard && jest --coverage",
-    "data:pull": "node ./scripts/pull-stations",
-    "data:load": "node ./scripts/load-stations"
+    "start": "node ./app",
+    "test": "standard && jest --coverage"
   },
   "dependencies": {
     "apollo-server": "^2.19.2",

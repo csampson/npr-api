@@ -1,31 +1,31 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: openpublicradio-db
+  name: npr-api-redis
   labels:
-    app: openpublicradio
+    app: npr-api
 spec:
   selector:
-    app: openpublicradio
+    app: npr-api
   ports:
   - port: 6379
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: openpublicradio-db
+  name: npr-api-redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: openpublicradio
+      app: npr-api
   template:
     metadata:
       labels:
-        app: openpublicradio
+        app: npr-api
     spec:
       containers:
-      - name: openpublicradio-db
-        image: redislabs/redisearch:2.0.3
+      - name: npr-api-redis
+        image: csampson/npr-db:latest
         ports:
           - containerPort: 6379

@@ -1,14 +1,14 @@
 version: "3.2"
 services:
-  openpublicradio-api:
+  npr-api-node:
     build:
       context: .
       dockerfile: ./Dockerfile
     depends_on:
-      - openpublicradio-db
+      - npr-api-redis
     ports:
       - "3000:3000"
     volumes:
       - .:/app
-  openpublicradio-db:
-    image: "redislabs/redisearch:2.0.4"
+  npr-api-redis:
+    image: "csampson/npr-db:latest"

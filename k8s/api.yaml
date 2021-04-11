@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: openpublicradio-api
+  name: npr-api-node
   labels:
-    app: openpublicradio
+    app: npr-api
 spec:
   type: LoadBalancer
   selector:
-    app: openpublicradio
+    app: npr-api
   ports:
     - port: 80
       targetPort: 3000
@@ -15,23 +15,24 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: openpublicradio-api
+  name: npr-api-node
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: openpublicradio
+      app: npr-api
   template:
     metadata:
       labels:
-        app: openpublicradio
+        app: npr-api
     spec:
       containers:
-      - name: openpublicradio-api
-        image: openpublicradio/api:0.0.1
+      - name: npr-api-node
+        image: csampson/npr-api:latest
+        imagePullPolicy: IfNotPresent
         env:
         - name: REDIS_HOST
-          value: "openpublicradio-db"
+          value: npr-api-redis
         - name: REDIS_PORT
           value: "6379"
         ports:
