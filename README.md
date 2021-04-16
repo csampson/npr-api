@@ -1,6 +1,6 @@
 # The Open Public Radio API
 
-A GraphQL API for querying information about [NPR](http://npr.org) member stations.
+A GraphQL API for querying information about [NPR](http://npr.org) member stations. Uses the RediSearch database available [here](https://github.com/csampson/npr-db).
 
 ## Requirements
 
@@ -14,10 +14,3 @@ Run locally with `docker-compose up`. This will build the images for the API and
 ## Testing
 
 Use `npm test` to run the unit tests.
-
-## Updating Data
-
-TODO: Update import process to use NPR API v3
-
-- This requires `NPR_API_KEY` and `GOOGLE_API_KEY` environment variables.
-- Use `npm run data:pull` to re-import station data from the NPR API and grab geolocation data from Google.
