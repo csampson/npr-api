@@ -20,7 +20,7 @@ class Station {
    * @see {@link http://redisearch.io/Query_Syntax}
    * @returns {Array} List of matching radio station records
    */
-  search (query) {
+  search (query = '') {
     query.replace(/\*/g, '')
 
     return this.database.execute('FT.SEARCH', ['stations', query + '*'])

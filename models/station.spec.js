@@ -16,19 +16,19 @@ describe('Station', () => {
   describe('#search', () => {
     beforeEach(() => {
       database.execute.mockResolvedValue([
-        '10',
-        'WWNO-FM',
+        '1',
+        'station:WWNO-FM',
         [
           'callsign', 'WWNO',
           'market_city', 'New Orleans',
-          'urls', '{"title":"WWNO-FM 89.9"}'
+          'json', '{ "callsign": "WWNO", "market_city": "New Orleans" }'
         ]
       ])
     })
 
     it('should resolve to a set of stations', () => {
-      expect(station.search()).resolves.toEqual([
-        { callsign: 'WWNO', market_city: 'New Orleans', urls: { title: 'WWNO-FM 89.9' } }
+      return expect(station.search()).resolves.toEqual([
+        { callsign: 'WWNO', market_city: 'New Orleans' }
       ])
     })
   })
