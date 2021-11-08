@@ -11,7 +11,7 @@
     "test": "standard && jest --coverage"
   },
   "dependencies": {
-    "apollo-server": "^2.19.2",
+    "apollo-server": "^2.25.3",
     "bunyan": "^1.8.15",
     "graphql": "14.7.0",
     "lodash": "^4.17.10",
