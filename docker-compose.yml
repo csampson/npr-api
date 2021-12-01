@@ -1,14 +1,18 @@
 version: "3.2"
 services:
-  npr-api-node:
+  api:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./build/api/Dockerfile
     depends_on:
-      - npr-api-redis
+      - redis
     ports:
       - "3000:3000"
-    volumes:
-      - .:/app
-  npr-api-redis:
-    image: "csampson/npr-db:latest"
+    # volumes:
+    #   - .:/app
+  redis:
+    build:
+      context: .
+      dockerfile: ./build/redis/Dockerfile
+    ports:
+      - "6379:6379"

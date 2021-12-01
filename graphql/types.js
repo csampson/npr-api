@@ -3,18 +3,18 @@
 const { gql } = require('apollo-server')
 
 module.exports = gql`
-  type URL {
+  type Link {
     href: String!
     rel: String
     title: String
   }
 
-  type URLs {
-    brand: [URL]
-    donate: [URL]
-    podcast: [URL]
-    programming: [URL]
-    streams: [URL]
+  type Links {
+    brand: [Link]
+    donate: [Link]
+    podcast: [Link]
+    programming: [Link]
+    streams: [Link]
   }
 
   type Station {
@@ -24,6 +24,7 @@ module.exports = gql`
     callsign: String!,
     fax: String,
     frequency: Float!,
+    geolocation: String,
     logo: String,
     market_city: String!,
     market_state: String!,
@@ -31,10 +32,10 @@ module.exports = gql`
     phone: Int,
     phone_extension: Int,
     tagline: String
-    urls: URLs!
+    links: Links!
   }
 
   type Query {
-    stations(query: String): [Station]
+    stations: [Station]
   }
 `

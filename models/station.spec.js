@@ -9,13 +9,18 @@ describe('Station', () => {
   let station
 
   beforeEach(() => {
-    database = { execute: jest.fn() }
+    database = {
+      client: {
+        ft: { search: jest.fn() }
+      }
+    }
+
     station = new Station(database)
   })
 
-  describe('#search', () => {
+  describe('#all', () => {
     beforeEach(() => {
-      database.execute.mockResolvedValue([
+      database.client.ft.search.mockResolvedValue([
         '1',
         'station:WWNO-FM',
         [
@@ -27,7 +32,7 @@ describe('Station', () => {
     })
 
     it('should resolve to a set of stations', () => {
-      return expect(station.search()).resolves.toEqual([
+      return expect(station.all()).resolves.toEqual([
         { callsign: 'WWNO', market_city: 'New Orleans' }
       ])
     })

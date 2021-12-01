@@ -1,4 +1,4 @@
-FROM node:14.10.1-alpine
+FROM node:16.3.0-alpine
 
 RUN mkdir -p /opt/app
 WORKDIR /opt/app
@@ -9,7 +9,7 @@ COPY yarn.lock /opt/app
 RUN yarn --production
 COPY . /opt/app
 
-ENV REDIS_HOST npr-api-redis
+ENV REDIS_HOST redis
 ENV PORT 3000
 EXPOSE 3000
 
