@@ -9,8 +9,6 @@ COPY yarn.lock /opt/app
 RUN yarn --production
 COPY . /opt/app
 
-ENV REDIS_HOST redis
-ENV PORT 3000
 EXPOSE 3000
 
 CMD ["yarn", "start"]
